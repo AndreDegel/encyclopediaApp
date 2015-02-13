@@ -8,8 +8,7 @@ class Main:
     def __init__(self, master):
 
         #Creates userSearch Variable for storing user input
-        global userSearch
-        userSearch = StringVar()
+        self.userSearch = StringVar()
 
         #sets window to master, sets title, and window size
         self.master = master
@@ -19,7 +18,7 @@ class Main:
         #Creates labels, buttons, and textbox
         lblTitle = Label(self.master, text="Searchster", font=("Times 16 bold"), fg="green", )
         lblSearch = Label(self.master, text="Search: ", font=("Times 10"))
-        txtBoxSearch = Entry(self.master, width=17, textvariable=userSearch)
+        txtBoxSearch = Entry(self.master, width=17, textvariable=self.userSearch)
         btnSearch = Button(self.master, text="Search", width=14, command=self.search)
         btnQuit = Button(self.master, text="Close", width=14, command=self.close)
         lblWikiLabel = Label(self.master, text="           Wikipedia URL", font=("Times 10 bold"))
@@ -39,25 +38,27 @@ class Main:
 
     #Wikipedia Callback Event
     def wikicallback(self, event):
+        userSearch = self.userSearch.get()
         #Opens the hyperlink when left-clicked on
         webbrowser.open("http://en.wikipedia.org/w/index.php?title=" + str(userSearch))
 
     #Flickr Callback Event
     def flickrcallback(self, event):
+        userSearch = self.userSearch.get()
         #Opens the hyperlink when left-clicked on
         webbrowser.open("https://www.flickr.com/search/?q=" + str(userSearch))
 
     #Twitter Callback Event
     def twittercallback(self, event):
+        userSearch = self.userSearch.get()
         #Opens the hyperlink when left-clicked on
-         webbrowser.open("https://twitter.com/search?q=" + str(userSearch) + "&src=typd")
+        webbrowser.open("https://twitter.com/search?q=" + str(userSearch) + "&src=typd")
 
 
     #Search Function
     def search(self):
         #Gets text from search textbox
-        global userSearch
-        userSearch = userSearch.get()
+        userSearch = self.userSearch.get()
 
         #Opens the webbrowsers
         webbrowser.open("http://en.wikipedia.org/w/index.php?title=" + userSearch)
