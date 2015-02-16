@@ -57,6 +57,7 @@ class Main:
 
 
 
+
     #Search Function
     def search(self):
         #Gets text from search textbox
