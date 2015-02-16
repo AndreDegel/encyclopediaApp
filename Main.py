@@ -2,6 +2,7 @@ __author__ = 'Jesse'
 from tkinter import *
 import webbrowser
 import urllib.request
+import urllib.parse
 import re
 
 
@@ -34,7 +35,7 @@ class Main:
         btnQuit.grid(row=4, column=2)
         lblWikiLabel.grid(row=1, column=4, sticky=W)
         lblFlickrLabel.grid(row=3, column=4, sticky=W)
-        lblTwitterLabel.grid(row=5, column=4, sticky=W)
+        lblTwitterLabel.grid(row=7, column=4, sticky=W)
 
 
     #Wikipedia Callback Event
@@ -53,7 +54,7 @@ class Main:
     def twittercallback(self, event):
         userSearch = self.userSearch.get()
         #Opens the hyperlink when left-clicked on
-        # webbrowser.open("http://twitter.com/search?q=" + str(userSearch) + "&src=typd")
+        webbrowser.open("http://twitter.com/search?q=" + str(userSearch) + "&src=typd")
 
 
 
@@ -63,28 +64,64 @@ class Main:
         #Gets text from search textbox
         userSearch = self.userSearch.get()
 
-        #Twitter array
-        urlList = []
-        for i in range(0, 10):
-            url = "http://twitter.com/search?q=" + str(userSearch) + "&src=typd"
-            urlList.append(url + "\n")
-            #dataMatch = re.match(userSearch, userSearch)
-            #dataResults = urllib.request.urlopen(url)
-            #dataResults = urllib.request.urlparse(url)
-            # dataResultsString = str(dataResults)
-            #print(dataResults.read())
+        #Searching and pulling flickr##############
+        #Creates flickr array
+        flickrArray = []
 
-        #Flickr array
-        urlListFlickr = []
-        for i in range(0, 5):
-            url = "http://www.flickr.com/search/?q=" + str(userSearch)
+        #Creates variable for flickr URL and stores the value to be searched in FLickr
+        flickrUrl = "http://www.flickr.com/search/?q=" + str(userSearch)
+        flickrValues = {'s': userSearch}
 
-            #dataResults = urllib.request.urlopen(url)
-            #dataResults = urllib.request.unwrap(url)
-            # dataResultsString = str(dataResults)
+        #Encodes the data (Converts to bytes for searching)
+        flickrData = urllib.parse.urlencode(flickrValues)
+        flickrData = flickrData.encode('utf-8')
 
-            urlListFlickr.append(url + "\n")
+        #Requests the data from the url and the response opens that url to search
+        flickrRequest = urllib.request.Request(flickrUrl, flickrData)
+        flickrResponse = urllib.request.urlopen(flickrRequest)
 
+        #Reads and stores the data
+        flickrRespData = flickrResponse.read()
+
+        #Search for matching criteria within the respData
+        flickrREGEX = re.findall((userSearch), str(flickrRespData))
+
+        #Creates array and stores each matching item in that array
+
+        for eachFlickrItem in flickrREGEX:
+            if(len(flickrArray)>5):
+                break
+            else:
+                flickrArray.append(eachFlickrItem + "\n")
+
+        #Searching and pulling twitter tweets##############
+        #Creates twitter array
+        twitterArray = []
+
+        #Creates variable for twitter URL and stores the value to be searched in twitter
+        twitterUrl = "http://twitter.com/search?q=" + str(userSearch) + "&src=typd"
+        twitterValues = {'s': userSearch}
+
+        #Encodes the data (Converts to bytes for searching)
+        twitterData = urllib.parse.urlencode(twitterValues)
+        twitterData = twitterData.encode('utf-8')
+
+        #Requests the data from the url and the response opens that url to search
+        twitterRequest = urllib.request.Request(twitterUrl, twitterData)
+        twitterResponse = urllib.request.urlopen(twitterRequest)
+
+        #Reads and stores the data
+        TwitterRespData = twitterResponse.read()
+
+        #Search for matching criteria within the respData
+        twitterREGEX = re.findall((userSearch), str(TwitterRespData))
+
+        #For loop that adds the twitter item to twitter array
+        for eachTwitterItem in twitterREGEX:
+            if(len(twitterArray)>10):
+                break
+            else:
+                twitterArray.append(eachTwitterItem + "\n")
 
 
         #Opens the webbrowsers
@@ -98,14 +135,18 @@ class Main:
         lblDisplayWikiURL.grid(row=2, column=4, sticky=W)
 
         #Displays Flickr hyperlink in label and binds it to left-click event and places in grid
-        lblDisplayFlickrURL = Label(self.master, text=urlListFlickr, fg="Blue", cursor="hand2")
+        lblDisplayFlickrURL = Label(self.master, text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
         lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
         lblDisplayFlickrURL.grid(row=4, column=4, sticky=W)
+        lblDisplayFlickrData = Label(self.master, text=flickrArray)
+        lblDisplayFlickrData.grid(row=6, column=4, sticky=W)
 
         #Displays Twitter hyperlink in label and binds it to left-click event and places in grid
-        lblDisplayTwitterURL = Label(self.master, text=urlList, fg="Blue", cursor="hand2")
+        lblDisplayTwitterURL = Label(self.master, text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
         lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
-        lblDisplayTwitterURL.grid(row=6, column=4, sticky=W)
+        lblDisplayTwitterURL.grid(row=8, column=4, sticky=W)
+        lblDisplayTwitterData = Label(self.master, text=twitterArray)
+        lblDisplayTwitterData.grid(row=9, column=4, sticky=W)
 
 
     #Function for closing the window
