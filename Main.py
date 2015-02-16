@@ -1,7 +1,8 @@
 __author__ = 'Jesse'
 from tkinter import *
-import urllib.request
 import webbrowser
+import urllib.request
+import re
 
 
 class Main:
@@ -13,7 +14,7 @@ class Main:
         #sets window to master, sets title, and window size
         self.master = master
         self.master.title("Encyclopedia App")
-        self.master.geometry("500x230")
+        self.master.geometry("500x430")
 
         #Creates labels, buttons, and textbox
         lblTitle = Label(self.master, text="Searchster", font=("Times 16 bold"), fg="green", )
@@ -46,13 +47,14 @@ class Main:
     def flickrcallback(self, event):
         userSearch = self.userSearch.get()
         #Opens the hyperlink when left-clicked on
-        webbrowser.open("https://www.flickr.com/search/?q=" + str(userSearch))
+        webbrowser.open("http://www.flickr.com/search/?q=" + str(userSearch))
 
     #Twitter Callback Event
     def twittercallback(self, event):
         userSearch = self.userSearch.get()
         #Opens the hyperlink when left-clicked on
-        webbrowser.open("https://twitter.com/search?q=" + str(userSearch) + "&src=typd")
+        # webbrowser.open("http://twitter.com/search?q=" + str(userSearch) + "&src=typd")
+
 
 
     #Search Function
@@ -60,26 +62,49 @@ class Main:
         #Gets text from search textbox
         userSearch = self.userSearch.get()
 
+        #Twitter array
+        urlList = []
+        for i in range(0, 10):
+            url = "http://twitter.com/search?q=" + str(userSearch) + "&src=typd"
+            urlList.append(url + "\n")
+            #dataMatch = re.match(userSearch, userSearch)
+            #dataResults = urllib.request.urlopen(url)
+            #dataResults = urllib.request.urlparse(url)
+            # dataResultsString = str(dataResults)
+            #print(dataResults.read())
+
+        #Flickr array
+        urlListFlickr = []
+        for i in range(0, 5):
+            url = "http://www.flickr.com/search/?q=" + str(userSearch)
+
+            #dataResults = urllib.request.urlopen(url)
+            #dataResults = urllib.request.unwrap(url)
+            # dataResultsString = str(dataResults)
+
+            urlListFlickr.append(url + "\n")
+
+
+
         #Opens the webbrowsers
-        webbrowser.open("http://en.wikipedia.org/w/index.php?title=" + userSearch)
-        webbrowser.open("https://www.flickr.com/search/?q=" + userSearch)
-        webbrowser.open("https://twitter.com/search?q=" + userSearch + "&src=typd")
+        webbrowser.open("http://en.wikipedia.org/w/index.php?title=" + str(userSearch))
+        webbrowser.open("http://www.flickr.com/search/?q=" + str(userSearch))
+        webbrowser.open("http://twitter.com/search?q=" + str(userSearch) + "&src=typd")
 
         #Displays Wikipedia hyperlink in label and binds it to left-click event and places in grid
-        lblDisplayWikiURL = Label(self.master, text="http://en.wikipedia.org/w/index.php?title=" + userSearch, fg="Blue", cursor="hand2")
+        lblDisplayWikiURL = Label(self.master, text="http://en.wikipedia.org/w/index.php?title=" + str(userSearch), fg="Blue", cursor="hand2")
         lblDisplayWikiURL.bind('<Button-1>', self.wikicallback)
         lblDisplayWikiURL.grid(row=2, column=4, sticky=W)
 
         #Displays Flickr hyperlink in label and binds it to left-click event and places in grid
-        lblDisplayFlickrURL = Label(self.master, text="https://www.flickr.com/search/?q=" + userSearch, fg="Blue", cursor="hand2")
+        lblDisplayFlickrURL = Label(self.master, text=urlListFlickr, fg="Blue", cursor="hand2")
         lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
         lblDisplayFlickrURL.grid(row=4, column=4, sticky=W)
 
         #Displays Twitter hyperlink in label and binds it to left-click event and places in grid
-        lblDisplayTwitterURL = Label(self.master, text="https://twitter.com/search?q=" + userSearch + "&src=typd", fg="Blue", cursor="hand2")
+        lblDisplayTwitterURL = Label(self.master, text=urlList, fg="Blue", cursor="hand2")
         lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
         lblDisplayTwitterURL.grid(row=6, column=4, sticky=W)
-
 
 
     #Function for closing the window
