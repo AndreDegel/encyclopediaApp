@@ -27,6 +27,14 @@ class Main:
         lblFlickrLabel = Label(self.master, text="            Flickr URL", font=("Times 10 bold"))
         lblTwitterLabel = Label(self.master, text="          Twitter URL", font=("Times 10 bold"))
 
+        #Initialize the URL Labels and set there position in the grid
+        self.lblDisplayWikiURL = Label(self.master, text=" ")
+        self.lblDisplayWikiURL.grid(row=2, column=4, sticky=W)
+        self.lblDisplayFlickrURL = Label(self.master, text=" ")
+        self.lblDisplayFlickrURL.grid(row=4, column=4, sticky=W)
+        self.lblDisplayTwitterURL = Label(self.master, text=" ")
+        self.lblDisplayTwitterURL.grid(row=8, column=4, sticky=W)
+
         #Places labels, buttons, and textbox in grid format
         lblTitle.grid(row=1, column=2)
         lblSearch.grid(row=2, column=1, sticky=E)
@@ -130,21 +138,30 @@ class Main:
         webbrowser.open("http://twitter.com/search?q=" + str(userSearch) + "&src=typd")
 
         #Displays Wikipedia hyperlink in label and binds it to left-click event and places in grid
-        lblDisplayWikiURL = Label(self.master, text="http://en.wikipedia.org/w/index.php?title=" + str(userSearch), fg="Blue", cursor="hand2")
-        lblDisplayWikiURL.bind('<Button-1>', self.wikicallback)
-        lblDisplayWikiURL.grid(row=2, column=4, sticky=W)
+        self.lblDisplayWikiURL.config(text="http://en.wikipedia.org/w/index.php?title=" + str(userSearch), fg="Blue", cursor="hand2")
+        self.lblDisplayWikiURL.bind('<Button-1>', self.wikicallback)
+
+        '''I'll leave the original format for the URL's in here in case anybody need it or we have to change back'''
+        #lblDisplayWikiURL = Label(self.master, text="http://en.wikipedia.org/w/index.php?title=" + str(userSearch), fg="Blue", cursor="hand2")
+        #lblDisplayWikiURL.bind('<Button-1>', self.wikicallback)
+        #lblDisplayWikiURL.grid(row=2, column=4, sticky=W)
+        #lblDisplayFlickrURL = Label(self.master, text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
+        #lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
+        #lblDisplayFlickrURL.grid(row=4, column=4, sticky=W)
+        #lblDisplayTwitterURL = Label(self.master, text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
+        #lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
+        #lblDisplayTwitterURL.grid(row=8, column=4, sticky=W)
+
 
         #Displays Flickr hyperlink in label and binds it to left-click event and places in grid
-        lblDisplayFlickrURL = Label(self.master, text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
-        lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
-        lblDisplayFlickrURL.grid(row=4, column=4, sticky=W)
+        self.lblDisplayFlickrURL.config(text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
+        self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
         lblDisplayFlickrData = Label(self.master, text=flickrArray)
         lblDisplayFlickrData.grid(row=6, column=4, sticky=W)
 
         #Displays Twitter hyperlink in label and binds it to left-click event and places in grid
-        lblDisplayTwitterURL = Label(self.master, text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
-        lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
-        lblDisplayTwitterURL.grid(row=8, column=4, sticky=W)
+        self.lblDisplayTwitterURL.config(text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
+        self.lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
         lblDisplayTwitterData = Label(self.master, text=twitterArray)
         lblDisplayTwitterData.grid(row=9, column=4, sticky=W)
 
