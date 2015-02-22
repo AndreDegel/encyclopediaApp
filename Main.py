@@ -4,6 +4,9 @@ import webbrowser
 import urllib.request
 import urllib.parse
 import re
+from tweepy import Stream
+from tweepy import OAuthHandler
+from tweepy.streaming import StreamListener
 
 
 class Main:
@@ -171,8 +174,6 @@ class Main:
         self.master.destroy()
 
 
-
-
 #Creates the root window and loops it
 def main():
     root = Tk()
@@ -182,3 +183,37 @@ def main():
 #Loops the code so the windows stay open
 if __name__ == "__main__":
     main()
+
+
+############### Streaming Tweets ######################
+cKey = 'xLwpqmwpQLNfkKI5Ux5eHSRAP'
+cSecret = '56HR60btiSEjc03GO3Xm0i5VQSVOb9Xs5XQQZi2COQoxhjkqJE'
+aToken = '1187764111-LK8d4jwuumvY5XVFx5GKeHSQVcUxJsiEJoE1pMS'
+aSecret = 'o30rmM7frd8OONtU2QPZGTsw7s8KmGHEpdFYtEKsfJWjw'
+
+userSearch = str(input("Enter search criteria: "))
+
+class Listener(StreamListener):
+
+    def on_data(self, raw_data):
+        try:
+            tweet = raw_data.split(',"text":"')[1].split('","source')[0]
+            print(tweet)
+
+            # saveThisTweet = tweet
+            # saveFile2 = open('twitterDataBase3.csv', 'a')
+            # saveFile2.write(saveThisTweet)
+            # saveFile2.write('\n')
+            # saveFile2.close()
+            return True
+        except:
+            print("Failed")
+
+    def on_error(self, status_code):
+        print(status_code)
+
+authorize = OAuthHandler(cKey, cSecret)
+authorize.set_access_token(aToken, aSecret)
+
+twitterStream = Stream(authorize, Listener())
+twitterStream.filter(track=[str(userSearch)])
