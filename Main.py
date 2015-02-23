@@ -8,9 +8,72 @@ from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 
+############### Streaming Tweets ######################
+cKey = 'xLwpqmwpQLNfkKI5Ux5eHSRAP'
+cSecret = '56HR60btiSEjc03GO3Xm0i5VQSVOb9Xs5XQQZi2COQoxhjkqJE'
+aToken = '1187764111-LK8d4jwuumvY5XVFx5GKeHSQVcUxJsiEJoE1pMS'
+aSecret = 'o30rmM7frd8OONtU2QPZGTsw7s8KmGHEpdFYtEKsfJWjw'
+
+#userSearch = str(input("Enter search criteria: "))
+
+class Listener(StreamListener):
+
+    def __init__(self, api=None):
+        super(Listener, self).__init__()
+        self.numTweets = 0
+        #self.tweetArray = []
+        saveFile2 = open('tDB3.csv', 'w')
+        saveFile2.close()
+
+    def on_data(self, raw_data):
+
+        try:
+            #Sets tweet array and splits the data at text to the source, and then while numTweets is less than 10
+            #Adds tweets to array
+            self.tweetArray = []
+            tweet = raw_data.split(',"text":"')[1].split('","source')[0]
+            #print(tweet)
+            self.numTweets += 1
+            if(self.numTweets < 11):
+                self.tweetArray.append(tweet)
+                print(self.tweetArray)
+                saveFile2 = open('tDB3.csv', 'a')
+                saveThisTweet = tweet
+                saveFile2.write(saveThisTweet)
+                saveFile2.write('\n')
+                saveFile2.close()
+                return True
+            else:
+                return False
+
+
+
+
+
+
+        except:
+            print("Failed")
+
+
+
+
+    #Prints status of error if error occurs
+    def on_error(self, status_code):
+        print(status_code)
+
+#Sets consumer keys and access tokens
+authorize = OAuthHandler(cKey, cSecret)
+authorize.set_access_token(aToken, aSecret)
+
+#Streams the tweets using the Listener class and depending on the criteria of the userSearch
+#twitterStream = Stream(authorize, Listener())
+#twitterStream.filter(track=[userSearch])
+
 
 class Main:
+
     def __init__(self, master):
+
 
         #Creates userSearch Variable for storing user input
         self.userSearch = StringVar()
@@ -72,9 +135,15 @@ class Main:
 
     #Search Function
     def search(self):
+
+        #Streams the tweets using the Listener class and depending on the criteria of the userSearch
+        twitterStream = Stream(authorize, Listener())
+
+
         #Gets text from search textbox
         userSearch = self.userSearch.get()
-
+        twitterStream.filter(track=[userSearch])
+        #tweetArray = Listener.tweetArray
         #Searching and pulling flickr##############
         #Creates flickr array
         flickrArray = []
@@ -105,34 +174,6 @@ class Main:
             else:
                 flickrArray.append(eachFlickrItem + "\n")
 
-        #Searching and pulling twitter tweets##############
-        #Creates twitter array
-        twitterArray = []
-
-        #Creates variable for twitter URL and stores the value to be searched in twitter
-        twitterUrl = "http://twitter.com/search?q=" + str(userSearch) + "&src=typd"
-        twitterValues = {'s': userSearch}
-
-        #Encodes the data (Converts to bytes for searching)
-        twitterData = urllib.parse.urlencode(twitterValues)
-        twitterData = twitterData.encode('utf-8')
-
-        #Requests the data from the url and the response opens that url to search
-        twitterRequest = urllib.request.Request(twitterUrl, twitterData)
-        twitterResponse = urllib.request.urlopen(twitterRequest)
-
-        #Reads and stores the data
-        TwitterRespData = twitterResponse.read()
-
-        #Search for matching criteria within the respData
-        twitterREGEX = re.findall((userSearch), str(TwitterRespData))
-
-        #For loop that adds the twitter item to twitter array
-        for eachTwitterItem in twitterREGEX:
-            if(len(twitterArray)>10):
-                break
-            else:
-                twitterArray.append(eachTwitterItem + "\n")
 
 
         #Opens the webbrowsers
@@ -162,10 +203,15 @@ class Main:
         lblDisplayFlickrData = Label(self.master, text=flickrArray)
         lblDisplayFlickrData.grid(row=6, column=4, sticky=W)
 
+        #Opens the tDB3 file and reads for displayingin the lblDisplayTwitterData below, and then closes it
+        saveFile2 = open('tDB3.csv', 'r')
+        readFile = saveFile2.read()
+        saveFile2.close()
+
         #Displays Twitter hyperlink in label and binds it to left-click event and places in grid
         self.lblDisplayTwitterURL.config(text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
         self.lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
-        lblDisplayTwitterData = Label(self.master, text=twitterArray)
+        lblDisplayTwitterData = Label(self.master, text=readFile)
         lblDisplayTwitterData.grid(row=9, column=4, sticky=W)
 
 
@@ -185,35 +231,5 @@ if __name__ == "__main__":
     main()
 
 
-############### Streaming Tweets ######################
-cKey = 'xLwpqmwpQLNfkKI5Ux5eHSRAP'
-cSecret = '56HR60btiSEjc03GO3Xm0i5VQSVOb9Xs5XQQZi2COQoxhjkqJE'
-aToken = '1187764111-LK8d4jwuumvY5XVFx5GKeHSQVcUxJsiEJoE1pMS'
-aSecret = 'o30rmM7frd8OONtU2QPZGTsw7s8KmGHEpdFYtEKsfJWjw'
 
-userSearch = str(input("Enter search criteria: "))
 
-class Listener(StreamListener):
-
-    def on_data(self, raw_data):
-        try:
-            tweet = raw_data.split(',"text":"')[1].split('","source')[0]
-            print(tweet)
-
-            # saveThisTweet = tweet
-            # saveFile2 = open('twitterDataBase3.csv', 'a')
-            # saveFile2.write(saveThisTweet)
-            # saveFile2.write('\n')
-            # saveFile2.close()
-            return True
-        except:
-            print("Failed")
-
-    def on_error(self, status_code):
-        print(status_code)
-
-authorize = OAuthHandler(cKey, cSecret)
-authorize.set_access_token(aToken, aSecret)
-
-twitterStream = Stream(authorize, Listener())
-twitterStream.filter(track=[str(userSearch)])
