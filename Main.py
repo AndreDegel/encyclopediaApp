@@ -4,9 +4,19 @@ import webbrowser
 import urllib.request
 import urllib.parse
 import re
+from flickrapi import *
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
+
+############flickrApiSetup###########
+flKey = '13c592d3851810c8f1a97ed2bd38af90'
+flSecret = 'c3e96f35fe4ef875'
+'''
+Info for flicker API documentation:
+https://code.google.com/p/python-flickr-api/wiki/Tutorial
+http://www.janeriksolem.net/2009/02/using-python-to-download-images-from.html
+'''
 
 ############### Streaming Tweets ######################
 cKey = 'xLwpqmwpQLNfkKI5Ux5eHSRAP'
@@ -213,7 +223,6 @@ class Main:
         self.lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
         lblDisplayTwitterData = Label(self.master, text=readFile)
         lblDisplayTwitterData.grid(row=9, column=4, sticky=W)
-
 
     #Function for closing the window
     def close(self):
