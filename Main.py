@@ -4,19 +4,32 @@ import webbrowser
 import urllib.request
 import urllib.parse
 import re
-from flickrapi import *
+import flickrapi
+
+
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 
-############flickrApiSetup###########
-flKey = '13c592d3851810c8f1a97ed2bd38af90'
-flSecret = 'c3e96f35fe4ef875'
-'''
-Info for flicker API documentation:
-https://code.google.com/p/python-flickr-api/wiki/Tutorial
-http://www.janeriksolem.net/2009/02/using-python-to-download-images-from.html
-'''
+class flickrSearch:
+        ############flickrApiSetup###########
+        flKey = '13c592d3851810c8f1a97ed2bd38af90'
+        flSecret = 'c3e96f35fe4ef875'
+        '''
+        Info for flicker API documentation:
+        https://code.google.com/p/python-flickr-api/wiki/Tutorial
+        http://www.janeriksolem.net/2009/02/using-python-to-download-images-from.html
+        '''
+
+        userSearch = "dog"
+        flickr = flickrapi.FlickrAPI(flKey, flSecret, format='parsed-json')
+        photos = flickr.photos.search(tags=userSearch, per_page='10')
+        #photoSets = flickr.photosets.getList(user_id=userSearch)
+        #photoTitle = photoSets['photosets']['photoset'][0]['title']['_content']
+        print('First set title: %s' % photos)
+
+
+
 
 ############### Streaming Tweets ######################
 cKey = 'xLwpqmwpQLNfkKI5Ux5eHSRAP'
@@ -24,14 +37,11 @@ cSecret = '56HR60btiSEjc03GO3Xm0i5VQSVOb9Xs5XQQZi2COQoxhjkqJE'
 aToken = '1187764111-LK8d4jwuumvY5XVFx5GKeHSQVcUxJsiEJoE1pMS'
 aSecret = 'o30rmM7frd8OONtU2QPZGTsw7s8KmGHEpdFYtEKsfJWjw'
 
-#userSearch = str(input("Enter search criteria: "))
-
 class Listener(StreamListener):
 
     def __init__(self, api=None):
         super(Listener, self).__init__()
         self.numTweets = 0
-        #self.tweetArray = []
         saveFile2 = open('tDB3.csv', 'w')
         saveFile2.close()
 
@@ -141,9 +151,8 @@ class Main:
     #Search Function
     def search(self):
 
-        #Streams the tweets using the Listener class and depending on the criteria of the userSearch
+        #Streams the tweets using the Listener class and searches with the criteria of the userSearch
         twitterStream = Stream(authorize, Listener())
-
 
         #Gets text from search textbox
         userSearch = self.userSearch.get()
@@ -193,7 +202,7 @@ class Main:
         #Displays Flickr hyperlink in label and binds it to left-click event and places in grid
         self.lblDisplayFlickrURL.config(text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
         self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
-        self.lblDisplayFlickrData = Label(self.master, text=flickrArray)
+        self.lblDisplayFlickrData = Label(self.master, text=flickrSearch.photos)
         self.lblDisplayFlickrData.grid(row=10, column=2, sticky=W)
 
         #Opens the tDB3 file and reads for displayingin the lblDisplayTwitterData below, and then closes it
