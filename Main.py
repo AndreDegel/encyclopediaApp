@@ -46,16 +46,8 @@ class Listener(StreamListener):
             else:
                 return False
 
-
-
-
-
-
         except:
             print("Failed")
-
-
-
 
     #Prints status of error if error occurs
     def on_error(self, status_code):
@@ -81,7 +73,8 @@ class Main:
         #sets window to master, sets title, and window size
         self.master = master
         self.master.title("Encyclopedia App")
-        self.master.geometry("500x430")
+        self.master.geometry("1200x580")
+        self.master.resizable(width=FALSE, height=FALSE)
 
         #Creates labels, buttons, and textbox
         lblTitle = Label(self.master, text="Searchster", font=("Times 16 bold"), fg="green", )
@@ -89,27 +82,29 @@ class Main:
         txtBoxSearch = Entry(self.master, width=17, textvariable=self.userSearch)
         btnSearch = Button(self.master, text="Search", width=14, command=self.search)
         btnQuit = Button(self.master, text="Close", width=14, command=self.close)
-        lblWikiLabel = Label(self.master, text="           Wikipedia URL", font=("Times 10 bold"))
-        lblFlickrLabel = Label(self.master, text="            Flickr URL", font=("Times 10 bold"))
-        lblTwitterLabel = Label(self.master, text="          Twitter URL", font=("Times 10 bold"))
+        lblBlankLabel = Label(self.master, text="                  ")
+        lblWikiLabel = Label(self.master, text="Wikipedia:", font=("Times 10 bold"))
+        lblFlickrLabel = Label(self.master, text="Flickr:", font=("Times 10 bold"))
+        lblTwitterLabel = Label(self.master, text="Twitter:", font=("Times 10 bold"))
 
         #Initialize the URL Labels and set there position in the grid
-        self.lblDisplayWikiURL = Label(self.master, text=" ")
-        self.lblDisplayWikiURL.grid(row=2, column=4, sticky=W)
-        self.lblDisplayFlickrURL = Label(self.master, text=" ")
-        self.lblDisplayFlickrURL.grid(row=4, column=4, sticky=W)
-        self.lblDisplayTwitterURL = Label(self.master, text=" ")
-        self.lblDisplayTwitterURL.grid(row=8, column=4, sticky=W)
+        self.lblDisplayWikiURL = Label(self.master, text="")
+        self.lblDisplayFlickrURL = Label(self.master, text="")
+        self.lblDisplayTwitterURL = Label(self.master, text="")
 
         #Places labels, buttons, and textbox in grid format
-        lblTitle.grid(row=1, column=2)
+        lblTitle.grid(row=1, column=2, sticky=W)
         lblSearch.grid(row=2, column=1, sticky=E)
-        txtBoxSearch.grid(row=2, column=2)
-        btnSearch.grid(row=3, column=2)
-        btnQuit.grid(row=4, column=2)
-        lblWikiLabel.grid(row=1, column=4, sticky=W)
-        lblFlickrLabel.grid(row=3, column=4, sticky=W)
-        lblTwitterLabel.grid(row=7, column=4, sticky=W)
+        txtBoxSearch.grid(row=2, column=2, sticky=W)
+        btnSearch.grid(row=3, column=2, sticky=W)
+        btnQuit.grid(row=4, column=2, sticky=W)
+        lblBlankLabel.grid(row=5, column=2)
+        lblWikiLabel.grid(row=6, column=2, sticky=W)
+        lblFlickrLabel.grid(row=8, column=2, sticky=W)
+        lblTwitterLabel.grid(row=11, column=2, sticky=W)
+        self.lblDisplayWikiURL.grid(row=7, column=2, sticky=W)
+        self.lblDisplayFlickrURL.grid(row=9, column=2, sticky=W)
+        self.lblDisplayTwitterURL.grid(row=12, column=2, sticky=W)
 
 
     #Wikipedia Callback Event
@@ -185,34 +180,22 @@ class Main:
         self.lblDisplayWikiURL.config(text="http://en.wikipedia.org/w/index.php?title=" + str(userSearch), fg="Blue", cursor="hand2")
         self.lblDisplayWikiURL.bind('<Button-1>', self.wikicallback)
 
-        '''I'll leave the original format for the URL's in here in case anybody need it or we have to change back'''
-        #lblDisplayWikiURL = Label(self.master, text="http://en.wikipedia.org/w/index.php?title=" + str(userSearch), fg="Blue", cursor="hand2")
-        #lblDisplayWikiURL.bind('<Button-1>', self.wikicallback)
-        #lblDisplayWikiURL.grid(row=2, column=4, sticky=W)
-        #lblDisplayFlickrURL = Label(self.master, text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
-        #lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
-        #lblDisplayFlickrURL.grid(row=4, column=4, sticky=W)
-        #lblDisplayTwitterURL = Label(self.master, text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
-        #lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
-        #lblDisplayTwitterURL.grid(row=8, column=4, sticky=W)
-
-
         #Displays Flickr hyperlink in label and binds it to left-click event and places in grid
         self.lblDisplayFlickrURL.config(text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
         self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
-        lblDisplayFlickrData = Label(self.master, text=flickrArray)
-        lblDisplayFlickrData.grid(row=6, column=4, sticky=W)
+        self.lblDisplayFlickrData = Label(self.master, text=flickrArray)
+        self.lblDisplayFlickrData.grid(row=10, column=2, sticky=W)
 
         #Opens the tDB3 file and reads for displayingin the lblDisplayTwitterData below, and then closes it
-        saveFile2 = open('tDB3.csv', 'r')
+        saveFile2 = open('tDB3.csv')
         readFile = saveFile2.read()
         saveFile2.close()
 
         #Displays Twitter hyperlink in label and binds it to left-click event and places in grid
         self.lblDisplayTwitterURL.config(text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
         self.lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
-        lblDisplayTwitterData = Label(self.master, text=readFile)
-        lblDisplayTwitterData.grid(row=9, column=4, sticky=W)
+        self.lblDisplayTwitterData = Label(self.master, text=readFile)
+        self.lblDisplayTwitterData.grid(row=13, column=2, sticky=W)
 
 
     #Function for closing the window
