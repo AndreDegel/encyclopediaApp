@@ -5,30 +5,9 @@ import urllib.request
 import urllib.parse
 import re
 import flickrapi
-
-
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
-
-class flickrSearch:
-        ############flickrApiSetup###########
-        flKey = '13c592d3851810c8f1a97ed2bd38af90'
-        flSecret = 'c3e96f35fe4ef875'
-        '''
-        Info for flicker API documentation:
-        https://code.google.com/p/python-flickr-api/wiki/Tutorial
-        http://www.janeriksolem.net/2009/02/using-python-to-download-images-from.html
-        '''
-
-        userSearch = "dog"
-        flickr = flickrapi.FlickrAPI(flKey, flSecret, format='parsed-json')
-        photos = flickr.photos.search(tags=userSearch, per_page='10')
-        #photoSets = flickr.photosets.getList(user_id=userSearch)
-        #photoTitle = photoSets['photosets']['photoset'][0]['title']['_content']
-        print('First set title: %s' % photos)
-
-
 
 
 ############### Streaming Tweets ######################
@@ -37,19 +16,55 @@ cSecret = '56HR60btiSEjc03GO3Xm0i5VQSVOb9Xs5XQQZi2COQoxhjkqJE'
 aToken = '1187764111-LK8d4jwuumvY5XVFx5GKeHSQVcUxJsiEJoE1pMS'
 aSecret = 'o30rmM7frd8OONtU2QPZGTsw7s8KmGHEpdFYtEKsfJWjw'
 
+class flickrSearch:
+    def __init__(self, userSearchFlickr):
+        flKey = '13c592d3851810c8f1a97ed2bd38af90'
+        flSecret = 'c3e96f35fe4ef875'
+        '''
+        Info for flicker API documentation:
+        https://code.google.com/p/python-flickr-api/wiki/Tutorial
+        http://www.janeriksolem.net/2009/02/using-python-to-download-images-from.html
+        '''
+
+        self.numFlick = 1
+
+        saveFileFlickr = open('flickDB.csv', 'w')
+        saveFileFlickr.close()
+
+
+        flickrArray = []
+
+        flickr = flickrapi.FlickrAPI(flKey, flSecret, format='parsed-json')
+        photos = flickr.photos.search(tags=userSearchFlickr, per_page='10')
+        #photoSets = flickr.photosets.getList(user_id=userSearch)
+        #photoTitle = photos['photos']['photo']['0']
+        print('First set title: %s' % photos)
+
+        if(self.numFlick < 6):
+            flickrArray.append(photos)
+            saveFileFlickr = open('flickDB.csv', 'a')
+            saveFileFlickr.write(str(self.numFlick) + "." + ")" + " ")
+            saveFileFlickr.write(str(photos) + "\n")
+            saveFileFlickr.close()
+            self.numFlick += 1
+
+
 class Listener(StreamListener):
 
     def __init__(self, api=None):
         super(Listener, self).__init__()
         self.numTweets = 0
+        self.i = 1
+
+        #Opens the tDB3 file and overwrites it so you can append it repeatedly
         saveFile2 = open('tDB3.csv', 'w')
         saveFile2.close()
 
     def on_data(self, raw_data):
 
         try:
-            #Sets tweet array and splits the data at text to the source, and then while numTweets is less than 10
-            #Adds tweets to array
+
+            #Sets tweet array and splits the data at text to the source, and then while numTweets is less than 10 it adds tweets to array
             self.tweetArray = []
             tweet = raw_data.split(',"text":"')[1].split('","source')[0]
             #print(tweet)
@@ -58,10 +73,10 @@ class Listener(StreamListener):
                 self.tweetArray.append(tweet)
                 print(self.tweetArray)
                 saveFile2 = open('tDB3.csv', 'a')
-                saveThisTweet = tweet
-                saveFile2.write(saveThisTweet)
-                saveFile2.write('\n')
+                saveFile2.write(str(self.i) + "." + ")" + " ")
+                saveFile2.write(tweet + "\n")
                 saveFile2.close()
+                self.i += 1
                 return True
             else:
                 return False
@@ -85,7 +100,6 @@ authorize.set_access_token(aToken, aSecret)
 class Main:
 
     def __init__(self, master):
-
 
         #Creates userSearch Variable for storing user input
         self.userSearch = StringVar()
@@ -147,47 +161,52 @@ class Main:
 
 
 
-
     #Search Function
     def search(self):
+        #Gets text from search textbox
+        userSearch = self.userSearch.get()
+
+        flickrPull = flickrSearch(userSearchFlickr=userSearch)
+        flickrPull.userSearch = userSearch
 
         #Streams the tweets using the Listener class and searches with the criteria of the userSearch
         twitterStream = Stream(authorize, Listener())
 
-        #Gets text from search textbox
-        userSearch = self.userSearch.get()
+        #Filters the twitter results with the user search input
         twitterStream.filter(track=[userSearch])
-        #tweetArray = Listener.tweetArray
-        #Searching and pulling flickr##############
+
+########Searching and pulling flickr##############
+        # myFlickrSearch = flickrSearch()
+        # myFlickrSearch.userSearch = userSearch
+
         #Creates flickr array
-        flickrArray = []
-
-        #Creates variable for flickr URL and stores the value to be searched in FLickr
-        flickrUrl = "http://www.flickr.com/search/?q=" + str(userSearch)
-        flickrValues = {'s': userSearch}
-
-        #Encodes the data (Converts to bytes for searching)
-        flickrData = urllib.parse.urlencode(flickrValues)
-        flickrData = flickrData.encode('utf-8')
-
-        #Requests the data from the url and the response opens that url to search
-        flickrRequest = urllib.request.Request(flickrUrl, flickrData)
-        flickrResponse = urllib.request.urlopen(flickrRequest)
-
-        #Reads and stores the data
-        flickrRespData = flickrResponse.read()
-
-        #Search for matching criteria within the respData
-        flickrREGEX = re.findall((userSearch), str(flickrRespData))
-
-        #Creates array and stores each matching item in that array
-
-        for eachFlickrItem in flickrREGEX:
-            if(len(flickrArray)>5):
-                break
-            else:
-                flickrArray.append(eachFlickrItem + "\n")
-
+        # flickrArray = []
+        #
+        # #Creates variable for flickr URL and stores the value to be searched in FLickr
+        # flickrUrl = "http://www.flickr.com/search/?q=" + str(userSearch)
+        # flickrValues = {'s': userSearch}
+        #
+        # #Encodes the data (Converts to bytes for searching)
+        # flickrData = urllib.parse.urlencode(flickrValues)
+        # flickrData = flickrData.encode('utf-8')
+        #
+        # #Requests the data from the url and the response opens that url to search
+        # flickrRequest = urllib.request.Request(flickrUrl, flickrData)
+        # flickrResponse = urllib.request.urlopen(flickrRequest)
+        #
+        # #Reads and stores the data
+        # flickrRespData = flickrResponse.read()
+        #
+        # #Search for matching criteria within the respData
+        # flickrREGEX = re.findall((userSearch), str(flickrRespData))
+        #
+        # #Creates array and stores each matching item in that array
+        #
+        # for eachFlickrItem in flickrREGEX:
+        #     if(len(flickrArray)>5):
+        #         break
+        #     else:
+        #         flickrArray.append(eachFlickrItem + "\n")
 
 
         #Opens the webbrowsers
@@ -199,13 +218,18 @@ class Main:
         self.lblDisplayWikiURL.config(text="http://en.wikipedia.org/w/index.php?title=" + str(userSearch), fg="Blue", cursor="hand2")
         self.lblDisplayWikiURL.bind('<Button-1>', self.wikicallback)
 
+        #Opens the flickDB file and reads for displaying in the lblDisplayFlickrData below, and then closes it
+        saveFileFlickr = open('flickDB.csv')
+        readFileFlickr = saveFileFlickr.read()
+        saveFileFlickr.close()
+
         #Displays Flickr hyperlink in label and binds it to left-click event and places in grid
         self.lblDisplayFlickrURL.config(text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
         self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
-        self.lblDisplayFlickrData = Label(self.master, text=flickrSearch.photos)
+        self.lblDisplayFlickrData = Label(self.master, text=readFileFlickr)
         self.lblDisplayFlickrData.grid(row=10, column=2, sticky=W)
 
-        #Opens the tDB3 file and reads for displayingin the lblDisplayTwitterData below, and then closes it
+        #Opens the tDB3 file and reads for displaying in the lblDisplayTwitterData below, and then closes it
         saveFile2 = open('tDB3.csv')
         readFile = saveFile2.read()
         saveFile2.close()
@@ -219,6 +243,7 @@ class Main:
     #Function for closing the window
     def close(self):
         self.master.destroy()
+
 
 
 #Creates the root window and loops it
