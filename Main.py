@@ -4,17 +4,13 @@ import webbrowser
 import urllib.request
 import urllib.parse
 import re
+import textwrap
 import flickrapi
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
+import time
 
-
-############### Streaming Tweets ######################
-cKey = 'xLwpqmwpQLNfkKI5Ux5eHSRAP'
-cSecret = '56HR60btiSEjc03GO3Xm0i5VQSVOb9Xs5XQQZi2COQoxhjkqJE'
-aToken = '1187764111-LK8d4jwuumvY5XVFx5GKeHSQVcUxJsiEJoE1pMS'
-aSecret = 'o30rmM7frd8OONtU2QPZGTsw7s8KmGHEpdFYtEKsfJWjw'
 
 class flickrSearch:
     def __init__(self, userSearchFlickr):
@@ -31,23 +27,29 @@ class flickrSearch:
         saveFileFlickr = open('flickDB.csv', 'w')
         saveFileFlickr.close()
 
-
         flickrArray = []
 
         flickr = flickrapi.FlickrAPI(flKey, flSecret, format='parsed-json')
-        photos = flickr.photos.search(tags=userSearchFlickr, per_page='10')
+        photos = flickr.photos.search(tags=userSearchFlickr, title=userSearchFlickr, per_page='10')
         #photoSets = flickr.photosets.getList(user_id=userSearch)
         #photoTitle = photos['photos']['photo']['0']
         print('First set title: %s' % photos)
 
         if(self.numFlick < 6):
-            flickrArray.append(photos)
+            textwrapPhotos = ('\n' .join(textwrap.wrap(str(photos), 180)))
+            flickrArray.append(str(textwrapPhotos))
             saveFileFlickr = open('flickDB.csv', 'a')
             saveFileFlickr.write(str(self.numFlick) + "." + ")" + " ")
-            saveFileFlickr.write(str(photos) + "\n")
+            saveFileFlickr.write(str(textwrapPhotos))
             saveFileFlickr.close()
             self.numFlick += 1
 
+
+############### Streaming Tweets ######################
+cKey = 'xLwpqmwpQLNfkKI5Ux5eHSRAP'
+cSecret = '56HR60btiSEjc03GO3Xm0i5VQSVOb9Xs5XQQZi2COQoxhjkqJE'
+aToken = '1187764111-LK8d4jwuumvY5XVFx5GKeHSQVcUxJsiEJoE1pMS'
+aSecret = 'o30rmM7frd8OONtU2QPZGTsw7s8KmGHEpdFYtEKsfJWjw'
 
 class Listener(StreamListener):
 
@@ -67,14 +69,16 @@ class Listener(StreamListener):
             #Sets tweet array and splits the data at text to the source, and then while numTweets is less than 10 it adds tweets to array
             self.tweetArray = []
             tweet = raw_data.split(',"text":"')[1].split('","source')[0]
-            #print(tweet)
+
             self.numTweets += 1
+
             if(self.numTweets < 11):
-                self.tweetArray.append(tweet)
+                textwrapTweet = ('\n' .join(textwrap.wrap(tweet, 150)))
+                self.tweetArray.append(textwrapTweet)
                 print(self.tweetArray)
                 saveFile2 = open('tDB3.csv', 'a')
                 saveFile2.write(str(self.i) + "." + ")" + " ")
-                saveFile2.write(tweet + "\n")
+                saveFile2.write(textwrapTweet + "\n")
                 saveFile2.close()
                 self.i += 1
                 return True
@@ -107,8 +111,16 @@ class Main:
         #sets window to master, sets title, and window size
         self.master = master
         self.master.title("Encyclopedia App")
-        self.master.geometry("1200x580")
+        self.master.geometry("940x640")
         self.master.resizable(width=FALSE, height=FALSE)
+        #self.canvas = Canvas(self.master, borderwidth=0, highlightthickness=0)
+
+        # #Scrollbar
+        # scrlBar = Scrollbar(self.master, orient=VERTICAL)
+        # scrlBar.grid(row=1, column=10)
+        # self.canvas.config(width=1800, height=580)
+        # self.canvas.config(yscrollcommand=scrlBar.set)
+        # self.canvas.grid(column=0, row=0, sticky=N+S+E+W)
 
         #Creates labels, buttons, and textbox
         lblTitle = Label(self.master, text="Searchster", font=("Times 16 bold"), fg="green", )
@@ -121,10 +133,12 @@ class Main:
         lblFlickrLabel = Label(self.master, text="Flickr:", font=("Times 10 bold"))
         lblTwitterLabel = Label(self.master, text="Twitter:", font=("Times 10 bold"))
 
-        #Initialize the URL Labels and set there position in the grid
+        #Initialize the Labels and set there position in the grid so they can be reset repeatedly
         self.lblDisplayWikiURL = Label(self.master, text="")
         self.lblDisplayFlickrURL = Label(self.master, text="")
         self.lblDisplayTwitterURL = Label(self.master, text="")
+        self.lblDisplayFlickrData = Label(self.master, text="")
+        self.lblDisplayTwitterData = Label(self.master, text="")
 
         #Places labels, buttons, and textbox in grid format
         lblTitle.grid(row=1, column=2, sticky=W)
@@ -166,7 +180,8 @@ class Main:
         #Gets text from search textbox
         userSearch = self.userSearch.get()
 
-        flickrPull = flickrSearch(userSearchFlickr=userSearch)
+        #sets the userSearchFlickr to the userSearch get method
+        flickrPull = flickrSearch(userSearchFlickr=str(userSearch))
         flickrPull.userSearch = userSearch
 
         #Streams the tweets using the Listener class and searches with the criteria of the userSearch
@@ -226,7 +241,7 @@ class Main:
         #Displays Flickr hyperlink in label and binds it to left-click event and places in grid
         self.lblDisplayFlickrURL.config(text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
         self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
-        self.lblDisplayFlickrData = Label(self.master, text=readFileFlickr)
+        self.lblDisplayFlickrData.config(text=readFileFlickr, justify=LEFT)
         self.lblDisplayFlickrData.grid(row=10, column=2, sticky=W)
 
         #Opens the tDB3 file and reads for displaying in the lblDisplayTwitterData below, and then closes it
@@ -237,7 +252,7 @@ class Main:
         #Displays Twitter hyperlink in label and binds it to left-click event and places in grid
         self.lblDisplayTwitterURL.config(text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
         self.lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
-        self.lblDisplayTwitterData = Label(self.master, text=readFile)
+        self.lblDisplayTwitterData.config(text=readFile, justify=LEFT)
         self.lblDisplayTwitterData.grid(row=13, column=2, sticky=W)
 
     #Function for closing the window
