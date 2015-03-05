@@ -33,7 +33,7 @@ class flickrSearch:
         photos = flickr.photos.search(tags=userSearchFlickr, title=userSearchFlickr, per_page='10')
         #photoSets = flickr.photosets.getList(user_id=userSearch)
         #photoTitle = photos['photos']['photo']['0']
-        print('First set title: %s' % photos)
+        #print('First set title: %s' % photos)
 
         if(self.numFlick < 6):
             textwrapPhotos = ('\n' .join(textwrap.wrap(str(photos), 180)))
@@ -73,9 +73,9 @@ class Listener(StreamListener):
             self.numTweets += 1
 
             if(self.numTweets < 11):
-                textwrapTweet = ('\n' .join(textwrap.wrap(tweet, 150)))
+                textwrapTweet = ('\n' .join(textwrap.wrap(tweet, 160)))
                 self.tweetArray.append(textwrapTweet)
-                print(self.tweetArray)
+                #print(self.tweetArray)
                 saveFile2 = open('tDB3.csv', 'a')
                 saveFile2.write(str(self.i) + "." + ")" + " ")
                 saveFile2.write(textwrapTweet + "\n")
@@ -105,13 +105,16 @@ class Main:
 
     def __init__(self, master):
 
-        #Creates userSearch Variable for storing user input
+        #Creates userSearch Variable for storing user input and creates int vars for checkboxes
         self.userSearch = StringVar()
+        self.chkVar1 = IntVar()
+        self.chkVar2 = IntVar()
+        self.chkVar3 = IntVar()
 
         #sets window to master, sets title, and window size
         self.master = master
         self.master.title("Encyclopedia App")
-        self.master.geometry("940x640")
+        self.master.geometry("940x700")
         self.master.resizable(width=FALSE, height=FALSE)
         #self.canvas = Canvas(self.master, borderwidth=0, highlightthickness=0)
 
@@ -122,7 +125,7 @@ class Main:
         # self.canvas.config(yscrollcommand=scrlBar.set)
         # self.canvas.grid(column=0, row=0, sticky=N+S+E+W)
 
-        #Creates labels, buttons, and textbox
+        #Creates Widgets
         lblTitle = Label(self.master, text="Searchster", font=("Times 16 bold"), fg="green", )
         lblSearch = Label(self.master, text="Search: ", font=("Times 10"))
         txtBoxSearch = Entry(self.master, width=17, textvariable=self.userSearch)
@@ -132,6 +135,10 @@ class Main:
         lblWikiLabel = Label(self.master, text="Wikipedia:", font=("Times 10 bold"))
         lblFlickrLabel = Label(self.master, text="Flickr:", font=("Times 10 bold"))
         lblTwitterLabel = Label(self.master, text="Twitter:", font=("Times 10 bold"))
+        lblBlankLabel2 = Label(self.master, text="   ")
+        chkBtnWikipedia = Checkbutton(self.master, text="Wikipedia", variable=self.chkVar1, justify=LEFT)
+        chkBtnFlickr = Checkbutton(self.master, text="Flickr", variable=self.chkVar2, justify=LEFT)
+        chkBtnTwitter = Checkbutton(self.master, text="Twitter", variable=self.chkVar3, justify=LEFT)
 
         #Initialize the Labels and set there position in the grid so they can be reset repeatedly
         self.lblDisplayWikiURL = Label(self.master, text="")
@@ -140,19 +147,23 @@ class Main:
         self.lblDisplayFlickrData = Label(self.master, text="")
         self.lblDisplayTwitterData = Label(self.master, text="")
 
-        #Places labels, buttons, and textbox in grid format
+        #Places Widgets in grid format
         lblTitle.grid(row=1, column=2, sticky=W)
         lblSearch.grid(row=2, column=1, sticky=E)
         txtBoxSearch.grid(row=2, column=2, sticky=W)
-        btnSearch.grid(row=3, column=2, sticky=W)
-        btnQuit.grid(row=4, column=2, sticky=W)
-        lblBlankLabel.grid(row=5, column=2)
-        lblWikiLabel.grid(row=6, column=2, sticky=W)
-        lblFlickrLabel.grid(row=8, column=2, sticky=W)
-        lblTwitterLabel.grid(row=11, column=2, sticky=W)
-        self.lblDisplayWikiURL.grid(row=7, column=2, sticky=W)
-        self.lblDisplayFlickrURL.grid(row=9, column=2, sticky=W)
-        self.lblDisplayTwitterURL.grid(row=12, column=2, sticky=W)
+        btnSearch.grid(row=7, column=2, sticky=W)
+        btnQuit.grid(row=8, column=2, sticky=W)
+        lblBlankLabel.grid(row=9, column=2)
+        lblWikiLabel.grid(row=10, column=2, sticky=W)
+        lblFlickrLabel.grid(row=12, column=2, sticky=W)
+        lblTwitterLabel.grid(row=15, column=2, sticky=W)
+        lblBlankLabel2.grid(row=7, column=3)
+        chkBtnWikipedia.grid(row=3, column=2, sticky=W)
+        chkBtnFlickr.grid(row=4, column=2, sticky=W)
+        chkBtnTwitter.grid(row=5, column=2, sticky=W)
+        self.lblDisplayWikiURL.grid(row=11, column=2, sticky=W)
+        self.lblDisplayFlickrURL.grid(row=13, column=2, sticky=W)
+        self.lblDisplayTwitterURL.grid(row=16, column=2, sticky=W)
 
 
     #Wikipedia Callback Event
@@ -180,15 +191,55 @@ class Main:
         #Gets text from search textbox
         userSearch = self.userSearch.get()
 
-        #sets the userSearchFlickr to the userSearch get method
-        flickrPull = flickrSearch(userSearchFlickr=str(userSearch))
-        flickrPull.userSearch = userSearch
+        #Wikipedia Checkbox
+        if(self.chkVar1.get()):
+            print("WIkipedia Checked")
+            #webbrowser.open("http://en.wikipedia.org/w/index.php?title=" + str(userSearch))
 
-        #Streams the tweets using the Listener class and searches with the criteria of the userSearch
-        twitterStream = Stream(authorize, Listener())
+            #Displays Wikipedia hyperlink in label and binds it to left-click event and places in grid
+            self.lblDisplayWikiURL.config(text="http://en.wikipedia.org/w/index.php?title=" + str(userSearch), fg="Blue", cursor="hand2")
+            self.lblDisplayWikiURL.bind('<Button-1>', self.wikicallback)
 
-        #Filters the twitter results with the user search input
-        twitterStream.filter(track=[userSearch])
+        #Flickr Checkbox
+        if(self.chkVar2.get()):
+            print("Flickr Checked")
+            #sets the userSearchFlickr to the userSearch get method
+            flickrPull = flickrSearch(userSearchFlickr=str(userSearch))
+            flickrPull.userSearch = userSearch
+            #webbrowser.open("http://www.flickr.com/search/?q=" + str(userSearch))
+
+            #Opens the flickDB file and reads for displaying in the lblDisplayFlickrData below, and then closes it
+            saveFileFlickr = open('flickDB.csv')
+            readFileFlickr = saveFileFlickr.read()
+            saveFileFlickr.close()
+
+            #Displays Flickr hyperlink in label and binds it to left-click event and places in grid
+            self.lblDisplayFlickrURL.config(text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
+            self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
+            self.lblDisplayFlickrData.config(text=readFileFlickr, justify=LEFT)
+            self.lblDisplayFlickrData.grid(row=14, column=2, sticky=W)
+
+        #Twitter Checkbox
+        if(self.chkVar3.get()):
+            print("Twitter checked")
+            #webbrowser.open("http://twitter.com/search?q=" + str(userSearch) + "&src=typd")1q
+
+            #Streams the tweets using the Listener class and searches with the criteria of the userSearch
+            twitterStream = Stream(authorize, Listener())
+
+            #Filters the twitter results with the user search input
+            twitterStream.filter(track=[userSearch])
+
+            #Opens the tDB3 file and reads for displaying in the lblDisplayTwitterData below, and then closes it
+            saveFile2 = open('tDB3.csv')
+            readFile = saveFile2.read()
+            saveFile2.close()
+
+            #Displays Twitter hyperlink in label and binds it to left-click event and places in grid
+            self.lblDisplayTwitterURL.config(text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
+            self.lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
+            self.lblDisplayTwitterData.config(text=readFile, justify=LEFT)
+            self.lblDisplayTwitterData.grid(row=17, column=2, sticky=W)
 
 ########Searching and pulling flickr##############
         # myFlickrSearch = flickrSearch()
@@ -224,36 +275,6 @@ class Main:
         #         flickrArray.append(eachFlickrItem + "\n")
 
 
-        #Opens the webbrowsers
-        webbrowser.open("http://en.wikipedia.org/w/index.php?title=" + str(userSearch))
-        webbrowser.open("http://www.flickr.com/search/?q=" + str(userSearch))
-        webbrowser.open("http://twitter.com/search?q=" + str(userSearch) + "&src=typd")
-
-        #Displays Wikipedia hyperlink in label and binds it to left-click event and places in grid
-        self.lblDisplayWikiURL.config(text="http://en.wikipedia.org/w/index.php?title=" + str(userSearch), fg="Blue", cursor="hand2")
-        self.lblDisplayWikiURL.bind('<Button-1>', self.wikicallback)
-
-        #Opens the flickDB file and reads for displaying in the lblDisplayFlickrData below, and then closes it
-        saveFileFlickr = open('flickDB.csv')
-        readFileFlickr = saveFileFlickr.read()
-        saveFileFlickr.close()
-
-        #Displays Flickr hyperlink in label and binds it to left-click event and places in grid
-        self.lblDisplayFlickrURL.config(text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
-        self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
-        self.lblDisplayFlickrData.config(text=readFileFlickr, justify=LEFT)
-        self.lblDisplayFlickrData.grid(row=10, column=2, sticky=W)
-
-        #Opens the tDB3 file and reads for displaying in the lblDisplayTwitterData below, and then closes it
-        saveFile2 = open('tDB3.csv')
-        readFile = saveFile2.read()
-        saveFile2.close()
-
-        #Displays Twitter hyperlink in label and binds it to left-click event and places in grid
-        self.lblDisplayTwitterURL.config(text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
-        self.lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
-        self.lblDisplayTwitterData.config(text=readFile, justify=LEFT)
-        self.lblDisplayTwitterData.grid(row=13, column=2, sticky=W)
 
     #Function for closing the window
     def close(self):
