@@ -3,6 +3,7 @@ from tkinter import *
 import webbrowser
 import urllib.request
 import urllib.parse
+import base64
 import re
 import textwrap
 import flickrapi
@@ -10,6 +11,22 @@ from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 import time
+import threading
+
+#
+# class ThreadedClient(threading.Thread):
+#     def __init__(self, queue1, fcn):
+#         self.queue1 = queue1
+#         self.fcn = fcn
+#         threading.Thread.__init__(self)
+#     def run(self):
+#         Main.create(self.queue1, self.fcn)
+        # time.sleep(1)
+        # self.queue1.put(self.fcn())
+
+# def spawnthread(fcn):
+#     thread = ThreadedClient(queue, fcn)
+#     thread.start()
 
 
 class flickrSearch:
@@ -30,10 +47,10 @@ class flickrSearch:
         flickrArray = []
 
         flickr = flickrapi.FlickrAPI(flKey, flSecret, format='parsed-json')
-        photos = flickr.photos.search(tags=userSearchFlickr, title=userSearchFlickr, per_page='10')
+        photos = flickr.photos.search(tags=userSearchFlickr, title=userSearchFlickr, per_page='1')
         #photoSets = flickr.photosets.getList(user_id=userSearch)
         #photoTitle = photos['photos']['photo']['0']
-        #print('First set title: %s' % photos)
+        # print('First set title: %s' % photos)
 
         if(self.numFlick < 6):
             textwrapPhotos = ('\n' .join(textwrap.wrap(str(photos), 180)))
@@ -55,6 +72,8 @@ class Listener(StreamListener):
 
     def __init__(self, api=None):
         super(Listener, self).__init__()
+
+
         self.numTweets = 0
         self.i = 1
 
@@ -84,7 +103,6 @@ class Listener(StreamListener):
                 return True
             else:
                 return False
-
         except:
             print("Failed")
 
@@ -126,19 +144,35 @@ class Main:
         # self.canvas.grid(column=0, row=0, sticky=N+S+E+W)
 
         #Creates Widgets
-        lblTitle = Label(self.master, text="Searchster", font=("Times 16 bold"), fg="green", )
+        lblTitle = Label(self.master, text="Searchster", font=("Times 18 bold"), fg="green")
         lblSearch = Label(self.master, text="Search: ", font=("Times 10"))
         txtBoxSearch = Entry(self.master, width=17, textvariable=self.userSearch)
         btnSearch = Button(self.master, text="Search", width=14, command=self.search)
+        btnClear = Button(self.master, text="Clear", width=14, command=self.clear)
         btnQuit = Button(self.master, text="Close", width=14, command=self.close)
+        chkBtnWikipedia = Checkbutton(self.master, text="Wikipedia", variable=self.chkVar1, justify=LEFT)
+        chkBtnFlickr = Checkbutton(self.master, text="Flickr", variable=self.chkVar2, justify=LEFT)
+        chkBtnTwitter = Checkbutton(self.master, text="Twitter", variable=self.chkVar3, justify=LEFT)
         lblBlankLabel = Label(self.master, text="                  ")
         lblWikiLabel = Label(self.master, text="Wikipedia:", font=("Times 10 bold"))
         lblFlickrLabel = Label(self.master, text="Flickr:", font=("Times 10 bold"))
         lblTwitterLabel = Label(self.master, text="Twitter:", font=("Times 10 bold"))
-        lblBlankLabel2 = Label(self.master, text="   ")
-        chkBtnWikipedia = Checkbutton(self.master, text="Wikipedia", variable=self.chkVar1, justify=LEFT)
-        chkBtnFlickr = Checkbutton(self.master, text="Flickr", variable=self.chkVar2, justify=LEFT)
-        chkBtnTwitter = Checkbutton(self.master, text="Twitter", variable=self.chkVar3, justify=LEFT)
+
+
+        #Places Widgets in grid format
+        lblTitle.grid(row=1, column=2, sticky=W)
+        lblSearch.grid(row=2, column=1, sticky=E)
+        txtBoxSearch.grid(row=2, column=2, sticky=W)
+        chkBtnWikipedia.grid(row=3, column=2, sticky=W)
+        chkBtnFlickr.grid(row=4, column=2, sticky=W)
+        chkBtnTwitter.grid(row=5, column=2, sticky=W)
+        btnSearch.grid(row=7, column=2, sticky=W)
+        btnClear.grid(row=8, column=2, sticky=W)
+        btnQuit.grid(row=9, column=2, sticky=W)
+        lblBlankLabel.grid(row=10, column=2)
+        lblWikiLabel.grid(row=11, column=2, sticky=W)
+        lblFlickrLabel.grid(row=13, column=2, sticky=W)
+        lblTwitterLabel.grid(row=16, column=2, sticky=W)
 
         #Initialize the Labels and set there position in the grid so they can be reset repeatedly
         self.lblDisplayWikiURL = Label(self.master, text="")
@@ -146,25 +180,9 @@ class Main:
         self.lblDisplayTwitterURL = Label(self.master, text="")
         self.lblDisplayFlickrData = Label(self.master, text="")
         self.lblDisplayTwitterData = Label(self.master, text="")
-
-        #Places Widgets in grid format
-        lblTitle.grid(row=1, column=2, sticky=W)
-        lblSearch.grid(row=2, column=1, sticky=E)
-        txtBoxSearch.grid(row=2, column=2, sticky=W)
-        btnSearch.grid(row=7, column=2, sticky=W)
-        btnQuit.grid(row=8, column=2, sticky=W)
-        lblBlankLabel.grid(row=9, column=2)
-        lblWikiLabel.grid(row=10, column=2, sticky=W)
-        lblFlickrLabel.grid(row=12, column=2, sticky=W)
-        lblTwitterLabel.grid(row=15, column=2, sticky=W)
-        lblBlankLabel2.grid(row=7, column=3)
-        chkBtnWikipedia.grid(row=3, column=2, sticky=W)
-        chkBtnFlickr.grid(row=4, column=2, sticky=W)
-        chkBtnTwitter.grid(row=5, column=2, sticky=W)
-        self.lblDisplayWikiURL.grid(row=11, column=2, sticky=W)
-        self.lblDisplayFlickrURL.grid(row=13, column=2, sticky=W)
-        self.lblDisplayTwitterURL.grid(row=16, column=2, sticky=W)
-
+        self.lblDisplayWikiURL.grid(row=12, column=2, sticky=W)
+        self.lblDisplayFlickrURL.grid(row=14, column=2, sticky=W)
+        self.lblDisplayTwitterURL.grid(row=17, column=2, sticky=W)
 
     #Wikipedia Callback Event
     def wikicallback(self, event):
@@ -184,8 +202,6 @@ class Main:
         #Opens the hyperlink when left-clicked on
         webbrowser.open("http://twitter.com/search?q=" + str(userSearch) + "&src=typd")
 
-
-
     #Search Function
     def search(self):
         #Gets text from search textbox
@@ -193,7 +209,6 @@ class Main:
 
         #Wikipedia Checkbox
         if(self.chkVar1.get()):
-            print("WIkipedia Checked")
             #webbrowser.open("http://en.wikipedia.org/w/index.php?title=" + str(userSearch))
 
             #Displays Wikipedia hyperlink in label and binds it to left-click event and places in grid
@@ -202,7 +217,6 @@ class Main:
 
         #Flickr Checkbox
         if(self.chkVar2.get()):
-            print("Flickr Checked")
             #sets the userSearchFlickr to the userSearch get method
             flickrPull = flickrSearch(userSearchFlickr=str(userSearch))
             flickrPull.userSearch = userSearch
@@ -217,11 +231,10 @@ class Main:
             self.lblDisplayFlickrURL.config(text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
             self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
             self.lblDisplayFlickrData.config(text=readFileFlickr, justify=LEFT)
-            self.lblDisplayFlickrData.grid(row=14, column=2, sticky=W)
+            self.lblDisplayFlickrData.grid(row=15, column=2, sticky=W)
 
         #Twitter Checkbox
         if(self.chkVar3.get()):
-            print("Twitter checked")
             #webbrowser.open("http://twitter.com/search?q=" + str(userSearch) + "&src=typd")1q
 
             #Streams the tweets using the Listener class and searches with the criteria of the userSearch
@@ -239,58 +252,45 @@ class Main:
             self.lblDisplayTwitterURL.config(text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
             self.lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
             self.lblDisplayTwitterData.config(text=readFile, justify=LEFT)
-            self.lblDisplayTwitterData.grid(row=17, column=2, sticky=W)
+            self.lblDisplayTwitterData.grid(row=18, column=2, sticky=W)
 
-########Searching and pulling flickr##############
-        # myFlickrSearch = flickrSearch()
-        # myFlickrSearch.userSearch = userSearch
-
-        #Creates flickr array
-        # flickrArray = []
-        #
-        # #Creates variable for flickr URL and stores the value to be searched in FLickr
-        # flickrUrl = "http://www.flickr.com/search/?q=" + str(userSearch)
-        # flickrValues = {'s': userSearch}
-        #
-        # #Encodes the data (Converts to bytes for searching)
-        # flickrData = urllib.parse.urlencode(flickrValues)
-        # flickrData = flickrData.encode('utf-8')
-        #
-        # #Requests the data from the url and the response opens that url to search
-        # flickrRequest = urllib.request.Request(flickrUrl, flickrData)
-        # flickrResponse = urllib.request.urlopen(flickrRequest)
-        #
-        # #Reads and stores the data
-        # flickrRespData = flickrResponse.read()
-        #
-        # #Search for matching criteria within the respData
-        # flickrREGEX = re.findall((userSearch), str(flickrRespData))
-        #
-        # #Creates array and stores each matching item in that array
-        #
-        # for eachFlickrItem in flickrREGEX:
-        #     if(len(flickrArray)>5):
-        #         break
-        #     else:
-        #         flickrArray.append(eachFlickrItem + "\n")
-
-
+    #Function for clearing the labels
+    def clear(self):
+        self.lblDisplayWikiURL.config(text="")
+        self.lblDisplayFlickrURL.config(text="")
+        self.lblDisplayTwitterURL.config(text="")
+        self.lblDisplayFlickrData.grid_forget()
+        self.lblDisplayTwitterData.grid_forget()
 
     #Function for closing the window
     def close(self):
         self.master.destroy()
 
+# class MyMainApp(threading.Thread):
+#     def __init__(self):
+#         threading.Thread.__init__(self)
+#     #Function for clearing the labels
+#
+#     def run(self):
+#         self.root = Tk()
+#         Main(self.root)
 
-
-#Creates the root window and loops it
 def main():
     root = Tk()
     Main(root)
     root.mainloop()
 
+
 #Loops the code so the windows stay open
 if __name__ == "__main__":
     main()
+
+#         self.root.mainloop()
+# app = MyMainApp()
+# app.start()
+
+#Creates the root window and loops it
+
 
 
 
