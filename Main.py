@@ -27,37 +27,41 @@ import threading
 # def spawnthread(fcn):
 #     thread = ThreadedClient(queue, fcn)
 #     thread.start()
-
+flKey = '13c592d3851810c8f1a97ed2bd38af90'
+flSecret = 'c3e96f35fe4ef875'
 
 class flickrSearch:
     def __init__(self, userSearchFlickr):
-        flKey = '13c592d3851810c8f1a97ed2bd38af90'
-        flSecret = 'c3e96f35fe4ef875'
         '''
         Info for flicker API documentation:
         https://code.google.com/p/python-flickr-api/wiki/Tutorial
         http://www.janeriksolem.net/2009/02/using-python-to-download-images-from.html
         '''
-
         self.numFlick = 1
+        flickrArray = []
 
+        #Opent the flickDB file to overwrite it so you can continuously search
         saveFileFlickr = open('flickDB.csv', 'w')
         saveFileFlickr.close()
 
-        flickrArray = []
-
+        #Sets flickr key, secret, and format and then searches using the user input and sets how many images to display
         flickr = flickrapi.FlickrAPI(flKey, flSecret, format='parsed-json')
-        photos = flickr.photos.search(tags=userSearchFlickr, title=userSearchFlickr, per_page='1')
-        #photoSets = flickr.photosets.getList(user_id=userSearch)
-        #photoTitle = photos['photos']['photo']['0']
-        # print('First set title: %s' % photos)
+        photos = flickr.photos.search(tags=userSearchFlickr, title=userSearchFlickr, per_page='10')
+
+        #Gets specific data of image for building the photo URL
+        self.photoFarm = str(photos['photos']['photo'][0]['farm'])
+        self.photoServer = str(photos['photos']['photo'][0]['server'])
+        self.photoID = str(photos['photos']['photo'][0]['id'])
+        self.photoSecret = str(photos['photos']['photo'][0]['secret'])
+
+        #Builds the photo URL
+        self.buildPhotoURL = ("http://farm" + self.photoFarm + ".static.flickr.com/" + self.photoServer + "/" + self.photoID + "_" + self.photoSecret + "_m.jpg")
 
         if(self.numFlick < 6):
-            textwrapPhotos = ('\n' .join(textwrap.wrap(str(photos), 180)))
-            flickrArray.append(str(textwrapPhotos))
+            # textwrapPhotos = ('\n' .join(textwrap.wrap(str(photos), 180)))
+            # flickrArray.append(str(textwrapPhotos))
             saveFileFlickr = open('flickDB.csv', 'a')
-            saveFileFlickr.write(str(self.numFlick) + "." + ")" + " ")
-            saveFileFlickr.write(str(textwrapPhotos))
+            saveFileFlickr.write(str(self.buildPhotoURL))
             saveFileFlickr.close()
             self.numFlick += 1
 
@@ -196,6 +200,13 @@ class Main:
         #Opens the hyperlink when left-clicked on
         webbrowser.open("http://www.flickr.com/search/?q=" + str(userSearch))
 
+    #Opens the flickr image
+    def flickrDisplayPhotocallback(self, event):
+        saveFileFlickr = open('flickDB.csv')
+        readFileFlickr = saveFileFlickr.read()
+        saveFileFlickr.close()
+        webbrowser.open(readFileFlickr)
+
     #Twitter Callback Event
     def twittercallback(self, event):
         userSearch = self.userSearch.get()
@@ -230,7 +241,8 @@ class Main:
             #Displays Flickr hyperlink in label and binds it to left-click event and places in grid
             self.lblDisplayFlickrURL.config(text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
             self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
-            self.lblDisplayFlickrData.config(text=readFileFlickr, justify=LEFT)
+            self.lblDisplayFlickrData.config(text=readFileFlickr, fg="Blue", cursor="hand2", justify=LEFT)
+            self.lblDisplayFlickrData.bind('<Button-1>', self.flickrDisplayPhotocallback)
             self.lblDisplayFlickrData.grid(row=15, column=2, sticky=W)
 
         #Twitter Checkbox
