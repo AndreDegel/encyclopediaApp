@@ -37,33 +37,55 @@ class flickrSearch:
         https://code.google.com/p/python-flickr-api/wiki/Tutorial
         http://www.janeriksolem.net/2009/02/using-python-to-download-images-from.html
         '''
-        self.numFlick = 1
+
+        k = 0
+        h = 0
+        i = 0
+        x = 0
+        j = 0
+        p = 0
         flickrArray = []
 
-        #Opent the flickDB file to overwrite it so you can continuously search
-        saveFileFlickr = open('flickDB.csv', 'w')
-        saveFileFlickr.close()
+        #While loop that opens the flickDB files to overwrite them so you can continuously search
+        while(k < 10):
+            saveFileFlickr = open('flickDB' + str(h) + '.csv', 'w')
+            saveFileFlickr.close()
+            k += 1
+            h += 1
+
 
         #Sets flickr key, secret, and format and then searches using the user input and sets how many images to display
         flickr = flickrapi.FlickrAPI(flKey, flSecret, format='parsed-json')
         photos = flickr.photos.search(tags=userSearchFlickr, title=userSearchFlickr, per_page='10')
 
-        #Gets specific data of image for building the photo URL
-        self.photoFarm = str(photos['photos']['photo'][0]['farm'])
-        self.photoServer = str(photos['photos']['photo'][0]['server'])
-        self.photoID = str(photos['photos']['photo'][0]['id'])
-        self.photoSecret = str(photos['photos']['photo'][0]['secret'])
+        #While loop that gets specific data of the images for building the photo URL while i < 10
+        while(i < 10):
+            photoFarm = str(photos['photos']['photo'][i]['farm'])
+            photoServer = str(photos['photos']['photo'][i]['server'])
+            photoID = str(photos['photos']['photo'][i]['id'])
+            photoSecret = str(photos['photos']['photo'][i]['secret'])
 
-        #Builds the photo URL
-        self.buildPhotoURL = ("http://farm" + self.photoFarm + ".static.flickr.com/" + self.photoServer + "/" + self.photoID + "_" + self.photoSecret + "_m.jpg")
+            #Builds the photo URL
+            buildPhotoURL = ("http://farm" + photoFarm + ".static.flickr.com/" + photoServer + "/" + photoID + "_" + photoSecret + "_m.jpg")
 
-        if(self.numFlick < 6):
-            # textwrapPhotos = ('\n' .join(textwrap.wrap(str(photos), 180)))
-            # flickrArray.append(str(textwrapPhotos))
-            saveFileFlickr = open('flickDB.csv', 'a')
-            saveFileFlickr.write(str(self.buildPhotoURL))
+            #Adds the built image URLs to the flickrArray
+            flickrArray.append(buildPhotoURL)
+
+            i += 1
+
+        while(j < 10):
+        #Writes the photo URLS to the flickDB file
+            saveFileFlickr = open('flickDB' + str(x) + '.csv', 'a')
+            saveFileFlickr.write(flickrArray[p])
             saveFileFlickr.close()
-            self.numFlick += 1
+            j += 1
+            x += 1
+            p += 1
+
+
+
+
+        print(flickrArray)
 
 
 ############### Streaming Tweets ######################
