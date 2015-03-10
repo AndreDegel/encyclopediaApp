@@ -1,10 +1,6 @@
 __author__ = 'Jesse'
 from tkinter import *
 import webbrowser
-import urllib.request
-import urllib.parse
-import base64
-import re
 import textwrap
 import flickrapi
 from tweepy import Stream
@@ -32,12 +28,6 @@ flSecret = 'c3e96f35fe4ef875'
 
 class flickrSearch:
     def __init__(self, userSearchFlickr):
-        '''
-        Info for flicker API documentation:
-        https://code.google.com/p/python-flickr-api/wiki/Tutorial
-        http://www.janeriksolem.net/2009/02/using-python-to-download-images-from.html
-        '''
-
         k = 0
         h = 0
         i = 0
@@ -73,19 +63,14 @@ class flickrSearch:
 
             i += 1
 
+        #While loop that writes the photo URLS to the flickDB file
         while(j < 10):
-        #Writes the photo URLS to the flickDB file
             saveFileFlickr = open('flickDB' + str(x) + '.csv', 'a')
             saveFileFlickr.write(flickrArray[p])
             saveFileFlickr.close()
             j += 1
             x += 1
             p += 1
-
-
-
-
-        print(flickrArray)
 
 
 ############### Streaming Tweets ######################
@@ -198,17 +183,26 @@ class Main:
         lblBlankLabel.grid(row=10, column=2)
         lblWikiLabel.grid(row=11, column=2, sticky=W)
         lblFlickrLabel.grid(row=13, column=2, sticky=W)
-        lblTwitterLabel.grid(row=16, column=2, sticky=W)
+        lblTwitterLabel.grid(row=25, column=2, sticky=W)
 
         #Initialize the Labels and set there position in the grid so they can be reset repeatedly
         self.lblDisplayWikiURL = Label(self.master, text="")
         self.lblDisplayFlickrURL = Label(self.master, text="")
         self.lblDisplayTwitterURL = Label(self.master, text="")
         self.lblDisplayFlickrData = Label(self.master, text="")
+        self.lblDisplayFlickrData2 = Label(self.master, text="")
+        self.lblDisplayFlickrData3 = Label(self.master, text="")
+        self.lblDisplayFlickrData4 = Label(self.master, text="")
+        self.lblDisplayFlickrData5 = Label(self.master, text="")
+        self.lblDisplayFlickrData6 = Label(self.master, text="")
+        self.lblDisplayFlickrData7 = Label(self.master, text="")
+        self.lblDisplayFlickrData8 = Label(self.master, text="")
+        self.lblDisplayFlickrData9 = Label(self.master, text="")
+        self.lblDisplayFlickrData10 = Label(self.master, text="")
         self.lblDisplayTwitterData = Label(self.master, text="")
         self.lblDisplayWikiURL.grid(row=12, column=2, sticky=W)
         self.lblDisplayFlickrURL.grid(row=14, column=2, sticky=W)
-        self.lblDisplayTwitterURL.grid(row=17, column=2, sticky=W)
+        self.lblDisplayTwitterURL.grid(row=26, column=2, sticky=W)
 
     #Wikipedia Callback Event
     def wikicallback(self, event):
@@ -224,7 +218,70 @@ class Main:
 
     #Opens the flickr image
     def flickrDisplayPhotocallback(self, event):
-        saveFileFlickr = open('flickDB.csv')
+        saveFileFlickr = open('flickDB0.csv')
+        readFileFlickr = saveFileFlickr.read()
+        saveFileFlickr.close()
+        webbrowser.open(readFileFlickr)
+
+    #Opens the flickr image
+    def flickrDisplayPhotocallback2(self, event):
+        saveFileFlickr = open('flickDB1.csv')
+        readFileFlickr = saveFileFlickr.read()
+        saveFileFlickr.close()
+        webbrowser.open(readFileFlickr)
+
+    #Opens the flickr image
+    def flickrDisplayPhotocallback3(self, event):
+        saveFileFlickr = open('flickDB2.csv')
+        readFileFlickr = saveFileFlickr.read()
+        saveFileFlickr.close()
+        webbrowser.open(readFileFlickr)
+
+    #Opens the flickr image
+    def flickrDisplayPhotocallback4(self, event):
+        saveFileFlickr = open('flickDB3.csv')
+        readFileFlickr = saveFileFlickr.read()
+        saveFileFlickr.close()
+        webbrowser.open(readFileFlickr)
+
+    #Opens the flickr image
+    def flickrDisplayPhotocallback5(self, event):
+        saveFileFlickr = open('flickDB4.csv')
+        readFileFlickr = saveFileFlickr.read()
+        saveFileFlickr.close()
+        webbrowser.open(readFileFlickr)
+
+    #Opens the flickr image
+    def flickrDisplayPhotocallback6(self, event):
+        saveFileFlickr = open('flickDB5.csv')
+        readFileFlickr = saveFileFlickr.read()
+        saveFileFlickr.close()
+        webbrowser.open(readFileFlickr)
+
+    #Opens the flickr image
+    def flickrDisplayPhotocallback7(self, event):
+        saveFileFlickr = open('flickDB6.csv')
+        readFileFlickr = saveFileFlickr.read()
+        saveFileFlickr.close()
+        webbrowser.open(readFileFlickr)
+
+    #Opens the flickr image
+    def flickrDisplayPhotocallback8(self, event):
+        saveFileFlickr = open('flickDB7.csv')
+        readFileFlickr = saveFileFlickr.read()
+        saveFileFlickr.close()
+        webbrowser.open(readFileFlickr)
+
+    #Opens the flickr image
+    def flickrDisplayPhotocallback9(self, event):
+        saveFileFlickr = open('flickDB8.csv')
+        readFileFlickr = saveFileFlickr.read()
+        saveFileFlickr.close()
+        webbrowser.open(readFileFlickr)
+
+    #Opens the flickr image
+    def flickrDisplayPhotocallback10(self, event):
+        saveFileFlickr = open('flickDB9.csv')
         readFileFlickr = saveFileFlickr.read()
         saveFileFlickr.close()
         webbrowser.open(readFileFlickr)
@@ -255,17 +312,90 @@ class Main:
             flickrPull.userSearch = userSearch
             #webbrowser.open("http://www.flickr.com/search/?q=" + str(userSearch))
 
-            #Opens the flickDB file and reads for displaying in the lblDisplayFlickrData below, and then closes it
-            saveFileFlickr = open('flickDB.csv')
+            #Opens the flickDB files and reads them for displaying in the lblDisplayFlickrData labels below, and then closes it
+            saveFileFlickr = open('flickDB0.csv')
             readFileFlickr = saveFileFlickr.read()
+            saveFileFlickr.close()
+
+            saveFileFlickr = open('flickDB1.csv')
+            readFileFlickr2 = saveFileFlickr.read()
+            saveFileFlickr.close()
+
+            saveFileFlickr = open('flickDB2.csv')
+            readFileFlickr3 = saveFileFlickr.read()
+            saveFileFlickr.close()
+
+            saveFileFlickr = open('flickDB3.csv')
+            readFileFlickr4 = saveFileFlickr.read()
+            saveFileFlickr.close()
+
+            saveFileFlickr = open('flickDB4.csv')
+            readFileFlickr5 = saveFileFlickr.read()
+            saveFileFlickr.close()
+
+            saveFileFlickr = open('flickDB5.csv')
+            readFileFlickr6 = saveFileFlickr.read()
+            saveFileFlickr.close()
+
+            saveFileFlickr = open('flickDB6.csv')
+            readFileFlickr7 = saveFileFlickr.read()
+            saveFileFlickr.close()
+
+            saveFileFlickr = open('flickDB7.csv')
+            readFileFlickr8 = saveFileFlickr.read()
+            saveFileFlickr.close()
+
+            saveFileFlickr = open('flickDB8.csv')
+            readFileFlickr9 = saveFileFlickr.read()
+            saveFileFlickr.close()
+
+            saveFileFlickr = open('flickDB9.csv')
+            readFileFlickr10 = saveFileFlickr.read()
             saveFileFlickr.close()
 
             #Displays Flickr hyperlink in label and binds it to left-click event and places in grid
             self.lblDisplayFlickrURL.config(text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
             self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
+
             self.lblDisplayFlickrData.config(text=readFileFlickr, fg="Blue", cursor="hand2", justify=LEFT)
             self.lblDisplayFlickrData.bind('<Button-1>', self.flickrDisplayPhotocallback)
             self.lblDisplayFlickrData.grid(row=15, column=2, sticky=W)
+
+            self.lblDisplayFlickrData2.config(text=readFileFlickr2, fg="Blue", cursor="hand2", justify=LEFT)
+            self.lblDisplayFlickrData2.bind('<Button-1>', self.flickrDisplayPhotocallback2)
+            self.lblDisplayFlickrData2.grid(row=16, column=2, sticky=W)
+
+            self.lblDisplayFlickrData3.config(text=readFileFlickr3, fg="Blue", cursor="hand2", justify=LEFT)
+            self.lblDisplayFlickrData3.bind('<Button-1>', self.flickrDisplayPhotocallback3)
+            self.lblDisplayFlickrData3.grid(row=17, column=2, sticky=W)
+
+            self.lblDisplayFlickrData4.config(text=readFileFlickr4, fg="Blue", cursor="hand2", justify=LEFT)
+            self.lblDisplayFlickrData4.bind('<Button-1>', self.flickrDisplayPhotocallback4)
+            self.lblDisplayFlickrData4.grid(row=18, column=2, sticky=W)
+
+            self.lblDisplayFlickrData5.config(text=readFileFlickr5, fg="Blue", cursor="hand2", justify=LEFT)
+            self.lblDisplayFlickrData5.bind('<Button-1>', self.flickrDisplayPhotocallback5)
+            self.lblDisplayFlickrData5.grid(row=19, column=2, sticky=W)
+
+            self.lblDisplayFlickrData6.config(text=readFileFlickr6, fg="Blue", cursor="hand2", justify=LEFT)
+            self.lblDisplayFlickrData6.bind('<Button-1>', self.flickrDisplayPhotocallback6)
+            self.lblDisplayFlickrData6.grid(row=20, column=2, sticky=W)
+
+            self.lblDisplayFlickrData7.config(text=readFileFlickr7, fg="Blue", cursor="hand2", justify=LEFT)
+            self.lblDisplayFlickrData7.bind('<Button-1>', self.flickrDisplayPhotocallback7)
+            self.lblDisplayFlickrData7.grid(row=21, column=2, sticky=W)
+
+            self.lblDisplayFlickrData8.config(text=readFileFlickr8, fg="Blue", cursor="hand2", justify=LEFT)
+            self.lblDisplayFlickrData8.bind('<Button-1>', self.flickrDisplayPhotocallback8)
+            self.lblDisplayFlickrData8.grid(row=22, column=2, sticky=W)
+
+            self.lblDisplayFlickrData9.config(text=readFileFlickr9, fg="Blue", cursor="hand2", justify=LEFT)
+            self.lblDisplayFlickrData9.bind('<Button-1>', self.flickrDisplayPhotocallback9)
+            self.lblDisplayFlickrData9.grid(row=23, column=2, sticky=W)
+
+            self.lblDisplayFlickrData10.config(text=readFileFlickr10, fg="Blue", cursor="hand2", justify=LEFT)
+            self.lblDisplayFlickrData10.bind('<Button-1>', self.flickrDisplayPhotocallback10)
+            self.lblDisplayFlickrData10.grid(row=24, column=2, sticky=W)
 
         #Twitter Checkbox
         if(self.chkVar3.get()):
@@ -286,7 +416,7 @@ class Main:
             self.lblDisplayTwitterURL.config(text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
             self.lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
             self.lblDisplayTwitterData.config(text=readFile, justify=LEFT)
-            self.lblDisplayTwitterData.grid(row=18, column=2, sticky=W)
+            self.lblDisplayTwitterData.grid(row=27, column=2, sticky=W)
 
     #Function for clearing the labels
     def clear(self):
@@ -294,6 +424,15 @@ class Main:
         self.lblDisplayFlickrURL.config(text="")
         self.lblDisplayTwitterURL.config(text="")
         self.lblDisplayFlickrData.grid_forget()
+        self.lblDisplayFlickrData2.grid_forget()
+        self.lblDisplayFlickrData3.grid_forget()
+        self.lblDisplayFlickrData4.grid_forget()
+        self.lblDisplayFlickrData5.grid_forget()
+        self.lblDisplayFlickrData6.grid_forget()
+        self.lblDisplayFlickrData7.grid_forget()
+        self.lblDisplayFlickrData8.grid_forget()
+        self.lblDisplayFlickrData9.grid_forget()
+        self.lblDisplayFlickrData10.grid_forget()
         self.lblDisplayTwitterData.grid_forget()
 
     #Function for closing the window
@@ -324,8 +463,3 @@ if __name__ == "__main__":
 # app.start()
 
 #Creates the root window and loops it
-
-
-
-
-
