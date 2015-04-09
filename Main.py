@@ -444,7 +444,7 @@ class Main(Frame):
                 self.lblDisplayTwitterData.grid(row=27, column=2, sticky=W)
 
             #Starts the thread
-            time.sleep(3)
+            time.sleep(3000)
             multi = threading.Thread(target=search)
             multi.start()
 
