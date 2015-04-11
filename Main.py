@@ -136,6 +136,8 @@ authorize.set_access_token(aToken, aSecret)
 #twitterStream = Stream(authorize, Listener())
 #twitterStream.filter(track=[userSearch])
 
+#Boolean variable for the search thread that sets the variable to true while running and false when you quit the program
+alive = True
 
 class Main(Frame):
 
@@ -319,6 +321,7 @@ class Main(Frame):
 
         #Search Function
         def search():
+
             #Gets text from search textbox
             userSearch = self.userSearch.get()
 
@@ -443,13 +446,19 @@ class Main(Frame):
                 self.lblDisplayTwitterData.config(text=readFile, font=("Times 10"), justify=LEFT)
                 self.lblDisplayTwitterData.grid(row=27, column=2, sticky=W)
 
-            #Starts the thread
-            time.sleep(3000)
-            multi = threading.Thread(target=search)
-            multi.start()
+
+            def run():
+                #Starts the thread
+                while alive:
+                    multi = threading.Thread(target=search)
+                    multi.start()
+                    time.sleep(3000)
+                    #search().multi.terminate()
 
         multi = threading.Thread(target=search)
         multi.start()
+
+
 
     #Function for clearing the labels
     def clear(self):
@@ -470,7 +479,10 @@ class Main(Frame):
 
     #Function for closing the window
     def close(self):
+        alive = False
         self.master.destroy()
+
+
 
 # class MyMainApp(threading.Thread):
 #     def __init__(self):
