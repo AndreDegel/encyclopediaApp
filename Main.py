@@ -446,14 +446,11 @@ class Main(Frame):
                 self.lblDisplayTwitterData.config(text=readFile, font=("Times 10"), justify=LEFT)
                 self.lblDisplayTwitterData.grid(row=27, column=2, sticky=W)
 
-
+            #Function that starts the thread
             def run():
-                #Starts the thread
                 while alive:
                     multi = threading.Thread(target=search)
                     multi.start()
-                    time.sleep(3000)
-                    #search().multi.terminate()
 
         multi = threading.Thread(target=search)
         multi.start()
