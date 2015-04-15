@@ -455,8 +455,6 @@ class Main(Frame):
         multi = threading.Thread(target=search)
         multi.start()
 
-
-
     #Function for clearing the labels
     def clear(self):
         self.lblDisplayWikiURL.config(text="")
