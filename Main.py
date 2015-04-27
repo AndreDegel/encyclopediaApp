@@ -7,10 +7,23 @@ from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 from tkinter import messagebox
-import time
 import threading
-import queue
+import sqlite3
 
+# create a new database and connect to it
+cxn = sqlite3.connect('EncyclopediaDB')
+# initialize a cursor object to run execute commands on the connected database.
+cur = cxn.cursor()
+try:
+    # create the table and fill it with data
+    cur.execute('CREATE TABLE flickr(search VARCHAR(50), result VARCHAR(200))')
+    print("Successfully created the flickr table.")
+    cur.execute('CREATE TABLE wiki(search VARCHAR(50), result VARCHAR(200))')
+    print("Successfully created the wiki table.")
+    cur.execute('CREATE TABLE twitter(search VARCHAR(50), result VARCHAR(200))')
+    print("Successfully created the twitter table.")
+except sqlite3.OperationalError:
+    print("The table could not be created")
 #
 # class ThreadedClient(threading.Thread):
 #     def __init__(self, queue1, fcn):
@@ -454,6 +467,40 @@ class Main(Frame):
 
         multi = threading.Thread(target=search)
         multi.start()
+        # fill and show the database has to be outside of the thread otherwise it is not working
+        self.fillDB()
+        self.showDB()
+
+    def fillDB(self):
+        userSearch = self.userSearch.get()
+        flickrAddress = "http://www.flickr.com/search/?q=" + str(userSearch)
+        wikiAddress = "http://en.wikipedia.org/w/index.php?title=" + str(userSearch)
+        twitterAddress = "http://twitter.com/search?q=" + str(userSearch) + "&src=typd"
+        cur.execute('INSERT INTO flickr VALUES(?, ?);', (userSearch, flickrAddress))
+        cur.execute('INSERT INTO wiki VALUES(?, ?);', (userSearch, wikiAddress))
+        cur.execute('INSERT INTO twitter VALUES(?, ?);', (userSearch, twitterAddress))
+        cxn.commit()
+        print('Successfully committed')
+
+    def showDB(self):
+
+        cur.execute('SELECT * FROM flickr')
+        for eachUser in cur.fetchall():
+            print("Flickr table.")
+            print(eachUser)
+
+        cur.execute('SELECT * FROM wiki')
+        for eachUser in cur.fetchall():
+            print("Wiki table.")
+            print(eachUser)
+
+        cur.execute('SELECT * FROM twitter')
+        print("Twitter table.")
+        for eachUser in cur.fetchall():
+
+            print(eachUser)
+
+
 
     #Function for clearing the labels
     def clear(self):
@@ -475,6 +522,11 @@ class Main(Frame):
     #Function for closing the window
     def close(self):
         alive = False
+        cur.execute('DROP TABLE flickr')
+        cur.execute('DROP TABLE wiki')
+        cur.execute('DROP TABLE twitter')
+        cur.close()
+        cxn.close()
         self.master.destroy()
 
 
