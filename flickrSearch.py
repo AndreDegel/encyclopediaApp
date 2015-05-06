@@ -19,21 +19,16 @@ flSecret = flickrArray[1]
 class flickrSearch:
     def __init__(self, userSearchFlickr):
         searchPhotos = 10       #number of photos searched
-        k = 0
-        h = 0
         i = 0
-        x = 0
         j = 0
         p = 0
         self.flickrArray = []
 
         try:
             #While loop that opens the flickDB files to overwrite them so you can continuously search
-            while(k < searchPhotos):
-                saveFileFlickr = open('flickDB' + str(h) + '.csv', 'w')
-                saveFileFlickr.close()
-                k += 1
-                h += 1
+            saveFileFlickr = open('flickDB.csv', 'w')
+            saveFileFlickr.close()
+
 
             #Sets flickr key, secret, and format and then searches using the user input and sets how many images to display
             flickr = flickrapi.FlickrAPI(flKey, flSecret, format='parsed-json')
@@ -56,11 +51,10 @@ class flickrSearch:
 
             #While loop that writes the photo URLS to the flickDB file
             while(j < searchPhotos):
-                saveFileFlickr = open('flickDB' + str(x) + '.csv', 'a')
-                saveFileFlickr.write(self.flickrArray[p])
+                saveFileFlickr = open('flickDB.csv', 'a')
+                saveFileFlickr.write(self.flickrArray[p] + "\n")
                 saveFileFlickr.close()
                 j += 1
-                x += 1
                 p += 1
 
         except:
