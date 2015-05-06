@@ -20,8 +20,6 @@ class flickrSearch:
     def __init__(self, userSearchFlickr):
         searchPhotos = 10       #number of photos searched
         i = 0
-        j = 0
-        p = 0
         self.flickrArray = []
 
         try:
@@ -35,27 +33,26 @@ class flickrSearch:
             photos = flickr.photos.search(tags=userSearchFlickr, title=userSearchFlickr, per_page='10')
 
             #While loop that gets specific data of the images for building the photo URL while i < 10
-            while(i < searchPhotos):
+            while i < searchPhotos:
                 photoFarm = str(photos['photos']['photo'][i]['farm'])
                 photoServer = str(photos['photos']['photo'][i]['server'])
                 photoID = str(photos['photos']['photo'][i]['id'])
                 photoSecret = str(photos['photos']['photo'][i]['secret'])
 
                 #Builds the photo URL
-                buildPhotoURL = ("http://farm" + photoFarm + ".static.flickr.com/" + photoServer + "/" + photoID + "_" + photoSecret + "_m.jpg")
+                buildPhotoURL = ("http://farm" + photoFarm + ".static.flickr.com/" + photoServer + "/" + photoID + "_" + photoSecret + "_m.jpg\n")
 
                 #Adds the built image URLs to the flickrArray
                 self.flickrArray.append(buildPhotoURL)
 
                 i += 1
 
-            #While loop that writes the photo URLS to the flickDB file
-            while(j < searchPhotos):
-                saveFileFlickr = open('flickDB.csv', 'a')
-                saveFileFlickr.write(self.flickrArray[p] + "\n")
-                saveFileFlickr.close()
-                j += 1
-                p += 1
+            #For loop that writes the photo URLS to the flickDB file
+            saveFileFlickr = open('flickDB.csv', 'a')
+            for hyperlink in self.flickrArray:
+                saveFileFlickr.write(hyperlink)
+            saveFileFlickr.close()
+
 
         except:
             messagebox.showinfo("Error", "No Results returned")

@@ -8,7 +8,7 @@ class Listener(StreamListener):
     def __init__(self, api=None):
         super(Listener, self).__init__()
         self.searchTweets = 11
-
+        self.tweetArray = []
         self.numTweets = 0
         self.i = 1
 
@@ -21,12 +21,12 @@ class Listener(StreamListener):
         try:
 
             #Sets tweet array and splits the data at text to the source, and then while numTweets is less than 10 it adds tweets to array
-            self.tweetArray = []
+
             tweet = raw_data.split(',"text":"')[1].split('","source')[0]
 
             self.numTweets += 1
 
-            if(self.numTweets < self.searchTweets):
+            if self.numTweets < self.searchTweets:
                 textwrapTweet = ('\n' .join(textwrap.wrap(tweet, 85)))
                 self.tweetArray.append(textwrapTweet)
                 #print(self.tweetArray)
