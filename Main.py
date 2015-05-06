@@ -27,8 +27,7 @@ except sqlite3.OperationalError:
 twitterAuth = open('twitterAuth')
 authArray = []
 for line in twitterAuth:
-    pureline = line.strip("\n")
-    key = pureline.strip("'")
+    key = line.strip("\n")
     authArray.append(key)
 twitterAuth.close()
 
@@ -52,9 +51,9 @@ class Main(Frame):
 
         #Creates userSearch Variable for storing user input and creates int vars for checkboxes
         self.userSearch = StringVar()
-        self.chkVar1 = IntVar()
-        self.chkVar2 = IntVar()
-        self.chkVar3 = IntVar()
+        self.chkWiki = IntVar()
+        self.chkFlickr = IntVar()
+        self.chkTwitter = IntVar()
 
         #sets window to master, sets title, and window size
         self.master = master
@@ -77,9 +76,9 @@ class Main(Frame):
         btnSearch = Button(self.frame, text="Search", width=14, command=self.threadedSearch)
         btnClear = Button(self.frame, text="Clear", width=14, command=self.clear)
         btnQuit = Button(self.frame, text="Close", width=14, command=self.close)
-        chkBtnWikipedia = Checkbutton(self.frame, text="Wikipedia", variable=self.chkVar1, justify=LEFT)
-        chkBtnFlickr = Checkbutton(self.frame, text="Flickr", variable=self.chkVar2, justify=LEFT)
-        chkBtnTwitter = Checkbutton(self.frame, text="Twitter", variable=self.chkVar3, justify=LEFT)
+        chkBtnWikipedia = Checkbutton(self.frame, text="Wikipedia", variable=self.chkWiki, justify=LEFT)
+        chkBtnFlickr = Checkbutton(self.frame, text="Flickr", variable=self.chkFlickr, justify=LEFT)
+        chkBtnTwitter = Checkbutton(self.frame, text="Twitter", variable=self.chkTwitter, justify=LEFT)
         lblBlankLabel = Label(self.frame, text="                  ")
         lblWikiLabel = Label(self.frame, text="Wikipedia:", font=("Times 10 bold"))
         lblFlickrLabel = Label(self.frame, text="Flickr:", font=("Times 10 bold"))
@@ -224,7 +223,7 @@ class Main(Frame):
             userSearch = self.userSearch.get()
 
             #Wikipedia Checkbox
-            if(self.chkVar1.get()):
+            if(self.chkWiki.get()):
                 #webbrowser.open("http://en.wikipedia.org/w/index.php?title=" + str(userSearch))
 
                 #Displays Wikipedia hyperlink in label and binds it to left-click event and places in grid
@@ -232,7 +231,7 @@ class Main(Frame):
                 self.lblDisplayWikiURL.bind('<Button-1>', self.wikicallback)
 
             #Flickr Checkbox
-            if(self.chkVar2.get()):
+            if(self.chkFlickr.get()):
                 #sets the userSearchFlickr to the userSearch get method
                 flickrPull = flickrSearch(userSearchFlickr=str(userSearch))
                 flickrPull.userSearch = userSearch
@@ -324,7 +323,7 @@ class Main(Frame):
                 self.lblDisplayFlickrData10.grid(row=24, column=2, sticky=W)
 
             #Twitter Checkbox
-            if(self.chkVar3.get()):
+            if(self.chkTwitter.get()):
                 #webbrowser.open("http://twitter.com/search?q=" + str(userSearch) + "&src=typd")1q
 
                 #Streams the tweets using the Listener class and searches with the criteria of the userSearch
@@ -344,11 +343,6 @@ class Main(Frame):
                 self.lblDisplayTwitterData.config(text=readFile, font=("Times 10"), justify=LEFT)
                 self.lblDisplayTwitterData.grid(row=27, column=2, sticky=W)
 
-            #Function that starts the thread
-            def run():
-                while alive:
-                    multi = threading.Thread(target=search)
-                    multi.start()
 
         multi = threading.Thread(target=search)
         multi.start()

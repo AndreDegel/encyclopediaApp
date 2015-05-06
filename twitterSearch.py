@@ -7,6 +7,7 @@ class Listener(StreamListener):
 
     def __init__(self, api=None):
         super(Listener, self).__init__()
+        self.searchTweets = 11
 
         self.numTweets = 0
         self.i = 1
@@ -25,7 +26,7 @@ class Listener(StreamListener):
 
             self.numTweets += 1
 
-            if(self.numTweets < 11):
+            if(self.numTweets < self.searchTweets):
                 textwrapTweet = ('\n' .join(textwrap.wrap(tweet, 85)))
                 self.tweetArray.append(textwrapTweet)
                 #print(self.tweetArray)

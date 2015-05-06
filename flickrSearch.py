@@ -8,8 +8,7 @@ __author__ = 'Andre'
 flickrArray = []
 flickrAuth = open('flickerAuth')
 for line in flickrAuth:
-    pureline = line.strip("\n")
-    key = pureline.strip("'")
+    key = line.strip("\n")
     flickrArray.append(key)
 flickrAuth.close()
 
@@ -19,6 +18,7 @@ flSecret = flickrArray[1]
 
 class flickrSearch:
     def __init__(self, userSearchFlickr):
+        searchPhotos = 10
         k = 0
         h = 0
         i = 0
@@ -29,7 +29,7 @@ class flickrSearch:
 
         try:
             #While loop that opens the flickDB files to overwrite them so you can continuously search
-            while(k < 10):
+            while(k < searchPhotos):
                 saveFileFlickr = open('flickDB' + str(h) + '.csv', 'w')
                 saveFileFlickr.close()
                 k += 1
@@ -40,7 +40,7 @@ class flickrSearch:
             photos = flickr.photos.search(tags=userSearchFlickr, title=userSearchFlickr, per_page='10')
 
             #While loop that gets specific data of the images for building the photo URL while i < 10
-            while(i < 10):
+            while(i < searchPhotos):
                 photoFarm = str(photos['photos']['photo'][i]['farm'])
                 photoServer = str(photos['photos']['photo'][i]['server'])
                 photoID = str(photos['photos']['photo'][i]['id'])
@@ -55,7 +55,7 @@ class flickrSearch:
                 i += 1
 
             #While loop that writes the photo URLS to the flickDB file
-            while(j < 10):
+            while(j < searchPhotos):
                 saveFileFlickr = open('flickDB' + str(x) + '.csv', 'a')
                 saveFileFlickr.write(flickrArray[p])
                 saveFileFlickr.close()
