@@ -18,14 +18,14 @@ flSecret = flickrArray[1]
 
 class flickrSearch:
     def __init__(self, userSearchFlickr):
-        searchPhotos = 10
+        searchPhotos = 10       #number of photos searched
         k = 0
         h = 0
         i = 0
         x = 0
         j = 0
         p = 0
-        flickrArray = []
+        self.flickrArray = []
 
         try:
             #While loop that opens the flickDB files to overwrite them so you can continuously search
@@ -50,14 +50,14 @@ class flickrSearch:
                 buildPhotoURL = ("http://farm" + photoFarm + ".static.flickr.com/" + photoServer + "/" + photoID + "_" + photoSecret + "_m.jpg")
 
                 #Adds the built image URLs to the flickrArray
-                flickrArray.append(buildPhotoURL)
+                self.flickrArray.append(buildPhotoURL)
 
                 i += 1
 
             #While loop that writes the photo URLS to the flickDB file
             while(j < searchPhotos):
                 saveFileFlickr = open('flickDB' + str(x) + '.csv', 'a')
-                saveFileFlickr.write(flickrArray[p])
+                saveFileFlickr.write(self.flickrArray[p])
                 saveFileFlickr.close()
                 j += 1
                 x += 1

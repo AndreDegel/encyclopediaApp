@@ -54,6 +54,7 @@ class Main(Frame):
         self.chkWiki = IntVar()
         self.chkFlickr = IntVar()
         self.chkTwitter = IntVar()
+        self.flickrData = 10
 
         #sets window to master, sets title, and window size
         self.master = master
@@ -69,36 +70,53 @@ class Main(Frame):
         self.canvas.grid(row=0, column=0)
         self.canvas.create_window((0, 0), window=self.frame, anchor="nw", tags="self.frame")
 
-        #Creates Widgets
+        widgetArray = []
+        # Creates Widgets and put them in an array to put them onto the window
         lblTitle = Label(self.frame, text="Searchster", font=("Times 18 bold"), fg="green")
+        widgetArray.append(lblTitle)
         lblSearch = Label(self.frame, text="Search: ", font=("Times 10"))
+        widgetArray.append(lblSearch)
         txtBoxSearch = Entry(self.frame, width=17, textvariable=self.userSearch)
+        widgetArray.append(txtBoxSearch)
         btnSearch = Button(self.frame, text="Search", width=14, command=self.threadedSearch)
+        widgetArray.append(btnSearch)
         btnClear = Button(self.frame, text="Clear", width=14, command=self.clear)
+        widgetArray.append(btnClear)
         btnQuit = Button(self.frame, text="Close", width=14, command=self.close)
+        widgetArray.append(btnQuit)
         chkBtnWikipedia = Checkbutton(self.frame, text="Wikipedia", variable=self.chkWiki, justify=LEFT)
+        widgetArray.append(chkBtnWikipedia)
         chkBtnFlickr = Checkbutton(self.frame, text="Flickr", variable=self.chkFlickr, justify=LEFT)
+        widgetArray.append(chkBtnFlickr)
         chkBtnTwitter = Checkbutton(self.frame, text="Twitter", variable=self.chkTwitter, justify=LEFT)
+        widgetArray.append(chkBtnTwitter)
         lblBlankLabel = Label(self.frame, text="                  ")
+        widgetArray.append(lblBlankLabel)
         lblWikiLabel = Label(self.frame, text="Wikipedia:", font=("Times 10 bold"))
+        widgetArray.append(lblWikiLabel)
         lblFlickrLabel = Label(self.frame, text="Flickr:", font=("Times 10 bold"))
+        widgetArray.append(lblFlickrLabel)
         lblTwitterLabel = Label(self.frame, text="Twitter:", font=("Times 10 bold"))
+        widgetArray.append(lblTwitterLabel)
 
-
+        row = 1
+        columns = 2
         #Places Widgets in grid format
-        lblTitle.grid(row=1, column=2, sticky=W)
-        lblSearch.grid(row=2, column=1, sticky=E)
-        txtBoxSearch.grid(row=2, column=2, sticky=W)
-        chkBtnWikipedia.grid(row=3, column=2, sticky=W)
-        chkBtnFlickr.grid(row=4, column=2, sticky=W)
-        chkBtnTwitter.grid(row=5, column=2, sticky=W)
-        btnSearch.grid(row=7, column=2, sticky=W)
-        btnClear.grid(row=8, column=2, sticky=W)
-        btnQuit.grid(row=9, column=2, sticky=W)
-        lblBlankLabel.grid(row=10, column=2)
-        lblWikiLabel.grid(row=11, column=2, sticky=W)
-        lblFlickrLabel.grid(row=13, column=2, sticky=W)
-        lblTwitterLabel.grid(row=25, column=2, sticky=W)
+        for widget in widgetArray:
+
+            if widget == lblSearch:
+                widget.grid(row=row, column=1, sticky=E)
+                row -= 1
+            elif widget == lblBlankLabel:
+                widget.grid(row=row, column=columns)
+            elif widget == lblTwitterLabel:
+                widget.grid(row=25, column=columns, sticky=W)
+            else:
+                widget.grid(row=row, column=columns, sticky=W)
+            if row == 11 or row == 5:
+                row += 1
+            row += 1
+
 
         #Initialize the Labels and set there position in the grid so they can be reset repeatedly
         self.lblDisplayWikiURL = Label(self.frame, text="")
@@ -418,9 +436,3 @@ def main():
 #Loops the code so the windows stay open
 if __name__ == "__main__":
     main()
-
-#         self.root.mainloop()
-# app = MyMainApp()
-# app.start()
-
-#Creates the root window and loops it
