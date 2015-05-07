@@ -1,5 +1,3 @@
-import urllib
-import urllib.request
 from urllib.request import urlopen
 import io
 
@@ -12,7 +10,6 @@ import threading
 import sqlite3
 from flickrSearch import flickrSearch
 from twitterSearch import Listener
-import PIL
 from PIL import Image, ImageTk
 # create a new database and connect to it
 cxn = sqlite3.connect('EncyclopediaDB')
@@ -190,38 +187,20 @@ class Main(Frame):
                 #sets the userSearchFlickr to the userSearch get method
                 flickrPull = flickrSearch(userSearchFlickr=str(userSearch))
                 flickrPull.userSearch = userSearch
-                #webbrowser.open("http://www.flickr.com/search/?q=" + str(userSearch))
-
-                #Opens the flickDB files and reads them for displaying in the lblDisplayFlickrData labels below, and then closes it
-                saveFileFlickr = open('flickDB.csv')
-                readFileFlickr = saveFileFlickr.read()
-                saveFileFlickr.close()
 
 
                 #Displays Flickr hyperlink in label and binds it to left-click event and places in grid
                 self.lblDisplayFlickrURL.config(text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
                 self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
-                '''
-                self.lblDisplayFlickrData.config(text=readFileFlickr, font="Times 10", fg="Blue", cursor="hand2", justify=LEFT)
-                self.lblDisplayFlickrData.bind('<Button-1>', self.flickrDisplayPhotocallback)
-                self.lblDisplayFlickrData.grid(row=15, column=2, sticky=W)
-                '''
+
                 #Gets the bytes of images and then opens them with Pl and then displays them in a label
                 #Also binds the images to the URLS so they can be clicked on and open URL
                 row = 15
                 count = 0
-                size = 128, 128
 
-                saveFileFlickr = open('flickDB.csv', 'r')
-
-
-                for hyperlink in saveFileFlickr:
-                    hyperlink = hyperlink.strip("\n")
+                for image in flickrPull.imageArray:
                     count += 1
-                    imageBytes = urlopen(hyperlink).read()
-                    dataStream = io.BytesIO(imageBytes)
-                    pilImage = Image.open(dataStream)
-                    showImage = ImageTk.PhotoImage(pilImage)
+                    showImage = ImageTk.PhotoImage(image)
 
                     # TODO: figure way to display same with and without twitter search
                     if count == 1:
@@ -233,17 +212,13 @@ class Main(Frame):
                     elif count == 2:
                         self.imageLabel2 = Label(self.frame, image=showImage, cursor="hand2")
                         self.imageLabel2.image = showImage #keep a reference so that garbage collection doesn't make transparent
-                        self.imageLabel2.grid(row=row, column=2, sticky=E)
+                        self.imageLabel2.grid(row=row, column=3, sticky=E)
                         self.imageArray.append(self.imageLabel2)
                         row += 1
                         count = 0
 
-
-
-
                     #self.imageLabel.bind('<Button-1>', self.flickrDisplayPhotocallback)
 
-                saveFileFlickr.close()
             #Twitter Checkbox
             if self.chkTwitter.get():
                 #webbrowser.open("http://twitter.com/search?q=" + str(userSearch) + "&src=typd")1q
