@@ -221,21 +221,27 @@ class Main(Frame):
                     imageBytes = urlopen(hyperlink).read()
                     dataStream = io.BytesIO(imageBytes)
                     pilImage = Image.open(dataStream)
-                    print(pilImage)
                     showImage = ImageTk.PhotoImage(pilImage)
+
+                    # TODO: figure way to display same with and without twitter search
                     if count == 1:
                         self.imageLabel = Label(self.frame, image=showImage, cursor="hand2")
+                        self.imageLabel.image = showImage #keep a reference so that garbage collection doesn't make transparent
                         self.imageLabel.grid(row=row, column=2, sticky=W)
+                        self.imageArray.append(self.imageLabel)     #store the widgets in an array to be able to clear them out later
+
                     elif count == 2:
                         self.imageLabel2 = Label(self.frame, image=showImage, cursor="hand2")
-                        self.imageLabel2.grid(row=row, column=3, sticky=E)
+                        self.imageLabel2.image = showImage #keep a reference so that garbage collection doesn't make transparent
+                        self.imageLabel2.grid(row=row, column=2, sticky=E)
+                        self.imageArray.append(self.imageLabel2)
                         row += 1
                         count = 0
 
 
-                    #self.imageLabel.bind('<Button-1>', self.flickrDisplayPhotocallback)
-                    self.imageArray.append(self.imageLabel)     #store the widgets in an array to be able to clear them out later
 
+
+                    #self.imageLabel.bind('<Button-1>', self.flickrDisplayPhotocallback)
 
                 saveFileFlickr.close()
             #Twitter Checkbox
