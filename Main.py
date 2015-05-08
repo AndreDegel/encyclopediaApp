@@ -1,30 +1,12 @@
-from urllib.request import urlopen
-import io
-
 __author__ = 'Andre'
 from tkinter import *
 import webbrowser
 from tweepy import Stream
 from tweepy import OAuthHandler
 import threading
-import sqlite3
 from flickrSearch import flickrSearch
 from twitterSearch import Listener
-from PIL import Image, ImageTk
-# create a new database and connect to it
-cxn = sqlite3.connect('EncyclopediaDB')
-# initialize a cursor object to run execute commands on the connected database.
-cur = cxn.cursor()
-try:
-    # create the table and fill it with data
-    cur.execute('CREATE TABLE flickr(search VARCHAR(50), result VARCHAR(200))')
-    print("Successfully created the flickr table.")
-    cur.execute('CREATE TABLE wiki(search VARCHAR(50), result VARCHAR(200))')
-    print("Successfully created the wiki table.")
-    cur.execute('CREATE TABLE twitter(search VARCHAR(50), result VARCHAR(200))')
-    print("Successfully created the twitter table.")
-except sqlite3.OperationalError:
-    print("The table could not be created or exists already")
+from PIL import ImageTk
 
 # Read the Key and secret from a file and add it to an array for security
 # read out of array for authentication
@@ -152,11 +134,8 @@ class Main(Frame):
         webbrowser.open("http://www.flickr.com/search/?q=" + str(userSearch))
 
     #Opens the flickr image
-    def flickrDisplayPhotocallback(self, event):
-        saveFileFlickr = open('flickDB.csv')
-        readFileFlickr = saveFileFlickr.read()
-        saveFileFlickr.close()
-        webbrowser.open(readFileFlickr)
+    def flickrDisplayPhotocallback(self, event, url):
+        webbrowser.open(url)
 
 
     #Twitter Callback Event
@@ -176,7 +155,6 @@ class Main(Frame):
 
             #Wikipedia Checkbox
             if self.chkWiki.get():
-                #webbrowser.open("http://en.wikipedia.org/w/index.php?title=" + str(userSearch))
 
                 #Displays Wikipedia hyperlink in label and binds it to left-click event and places in grid
                 self.lblDisplayWikiURL.config(text="http://en.wikipedia.org/w/index.php?title=" + str(userSearch), font="Times 10", fg="Blue", cursor="hand2")
@@ -193,35 +171,47 @@ class Main(Frame):
                 self.lblDisplayFlickrURL.config(text="http://www.flickr.com/search/?q=" + str(userSearch), fg="Blue", cursor="hand2")
                 self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
 
-                #Gets the bytes of images and then opens them with Pl and then displays them in a label
-                #Also binds the images to the URLS so they can be clicked on and open URL
+                # Presets the counters for the photo getter
                 row = 15
                 count = 0
+                urlNr = 0
+                columns = 3
+                # checks if the twitter checkbox is clicked and if so, sets the column for
+                # every other image different, to have it evenly displayed (otherwise pictures out of frame)
+                if self.chkTwitter.get():
+                    columns = 2
 
+
+                #Gets the images that are stored in the imageArray, then opens them with PIL, and then displays them in a label
+                #Also binds the images to the URLS so they can be clicked on and open URL
                 for image in flickrPull.imageArray:
                     count += 1
                     showImage = ImageTk.PhotoImage(image)
+                    url = flickrPull.flickrArray[urlNr]
+                    urlNr += 1
 
-                    # TODO: figure way to display same with and without twitter search
+
                     if count == 1:
                         self.imageLabel = Label(self.frame, image=showImage, cursor="hand2")
                         self.imageLabel.image = showImage #keep a reference so that garbage collection doesn't make transparent
                         self.imageLabel.grid(row=row, column=2, sticky=W)
                         self.imageArray.append(self.imageLabel)     #store the widgets in an array to be able to clear them out later
+                        self.imageLabel.bind('<Button-1>', lambda event, arg=url: self.flickrDisplayPhotocallback(event, arg))
+
 
                     elif count == 2:
                         self.imageLabel2 = Label(self.frame, image=showImage, cursor="hand2")
                         self.imageLabel2.image = showImage #keep a reference so that garbage collection doesn't make transparent
-                        self.imageLabel2.grid(row=row, column=3, sticky=E)
+                        self.imageLabel2.grid(row=row, column=columns, sticky=E)
                         self.imageArray.append(self.imageLabel2)
+                        self.imageLabel2.bind('<Button-1>', lambda event, arg=url: self.flickrDisplayPhotocallback(event, arg))
                         row += 1
                         count = 0
 
-                    #self.imageLabel.bind('<Button-1>', self.flickrDisplayPhotocallback)
+
 
             #Twitter Checkbox
             if self.chkTwitter.get():
-                #webbrowser.open("http://twitter.com/search?q=" + str(userSearch) + "&src=typd")1q
 
                 #Streams the tweets using the Listener class and searches with the criteria of the userSearch
                 twitterStream = Stream(authorize, Listener())
@@ -243,40 +233,6 @@ class Main(Frame):
 
         multi = threading.Thread(target=search)
         multi.start()
-        # fill and show the database has to be outside of the thread otherwise it is not working
-        self.fillDB()
-        self.showDB()
-
-    def fillDB(self):
-        userSearch = self.userSearch.get()
-        flickrAddress = "http://www.flickr.com/search/?q=" + str(userSearch)
-        wikiAddress = "http://en.wikipedia.org/w/index.php?title=" + str(userSearch)
-        twitterAddress = "http://twitter.com/search?q=" + str(userSearch) + "&src=typd"
-        cur.execute('INSERT INTO flickr VALUES(?, ?);', (userSearch, flickrAddress))
-        cur.execute('INSERT INTO wiki VALUES(?, ?);', (userSearch, wikiAddress))
-        cur.execute('INSERT INTO twitter VALUES(?, ?);', (userSearch, twitterAddress))
-        cxn.commit()
-        print('Successfully committed')
-
-    def showDB(self):
-
-        cur.execute('SELECT * FROM flickr')
-        for eachUser in cur.fetchall():
-            print("Flickr table.")
-            print(eachUser)
-
-        cur.execute('SELECT * FROM wiki')
-        for eachUser in cur.fetchall():
-            print("Wiki table.")
-            print(eachUser)
-
-        cur.execute('SELECT * FROM twitter')
-        print("Twitter table.")
-        for eachUser in cur.fetchall():
-
-            print(eachUser)
-
-
 
     #Function for clearing the labels
     def clear(self):
@@ -291,11 +247,6 @@ class Main(Frame):
     #Function for closing the window
     def close(self):
         alive = False
-        cur.execute('DROP TABLE flickr')
-        cur.execute('DROP TABLE wiki')
-        cur.execute('DROP TABLE twitter')
-        cur.close()
-        cxn.close()
         self.master.destroy()
 
 
