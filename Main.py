@@ -1,5 +1,3 @@
-import tweepy
-
 __author__ = 'Andre'
 
 from tkinter import *
@@ -11,6 +9,7 @@ import threading
 from flickrSearch import flickrSearch
 from twitterSearch import Listener
 from PIL import ImageTk
+from wikipedia import *
 
 # Read the Key and secret from a file and add it to an array for security
 # read out of array for authentication
@@ -94,18 +93,19 @@ class Main(Frame):
         columns = 2
         #Places Widgets in grid format
         for widget in widgetArray:
-
+            # Put search label left next to text box
             if widget == lblSearch:
                 widget.grid(row=row, column=1, sticky=E)
                 row -= 1
-            elif widget == lblBlankLabel:
-                widget.grid(row=row, column=columns)
+            # have twitter label after flicker pictures
             elif widget == lblTwitterLabel:
-                widget.grid(row=25, column=columns, sticky=W)
+                widget.grid(row=27, column=columns, sticky=W)
+            # give an extra space for the wiki text and then put the flickr label
+            elif widget == lblFlickrLabel:
+                widget.grid(row=14, column=columns, sticky=W)
+            # otherwise put all the widgets one after another
             else:
                 widget.grid(row=row, column=columns, sticky=W)
-            if row == 11 or row == 5:
-                row += 1
             row += 1
 
 
@@ -113,11 +113,13 @@ class Main(Frame):
         self.lblDisplayWikiURL = Label(self.frame, text="")
         self.lblDisplayFlickrURL = Label(self.frame, text="")
         self.lblDisplayTwitterURL = Label(self.frame, text="")
+        self.lblDisplayWikiData = Label(self.frame, text="")
         self.lblDisplayFlickrData = Label(self.frame, text="")
         self.lblDisplayTwitterData = Label(self.frame, text="")
         self.lblDisplayWikiURL.grid(row=12, column=2, sticky=W)
-        self.lblDisplayFlickrURL.grid(row=14, column=2, sticky=W)
-        self.lblDisplayTwitterURL.grid(row=26, column=2, sticky=W)
+        self.lblDisplayWikiData.grid(row=13, column=2, sticky=W)
+        self.lblDisplayFlickrURL.grid(row=16, column=2, sticky=W)
+        self.lblDisplayTwitterURL.grid(row=28, column=2, sticky=W)
 
         self.frame.bind("<Configure>", self.OnFrameConfigure)
 
@@ -162,6 +164,20 @@ class Main(Frame):
 
                 #Displays Wikipedia hyperlink in label and binds it to left-click event and places in grid
                 self.lblDisplayWikiURL.config(text="http://en.wikipedia.org/w/index.php?title=" + str(userSearch), font="Times 10", fg="Blue", cursor="hand2")
+                # display the first two sentences of the wiki page using the wikipedia api
+                # http://stackoverflow.com/questions/4460921/extract-the-first-paragraph-from-a-wikipedia-article-python
+                try:
+                    self.lblDisplayWikiData.config(text=wikipedia.summary(userSearch, sentences=2), font="Times 10", justify=LEFT)
+                # Catch disambiguous pages
+                except DisambiguationError:
+                    messagebox.showwarning("Warning", "Articles are ambiguous. Try something more specific or check the Wiki page")
+                # Catch page not found
+                except PageError:
+                    messagebox.showerror("Error", "Sorry, but there is no such page on Wikipedia")
+                # Catch no connection as general error because it cant be cought
+                # as connection error because too many processes
+                except:
+                    messagebox.showerror("Error", "Could not connect to Wikipedia. Please check your Internet connection.")
                 self.lblDisplayWikiURL.bind('<Button-1>', self.wikicallback)
 
             #Flickr Checkbox
@@ -176,14 +192,15 @@ class Main(Frame):
                 self.lblDisplayFlickrURL.bind('<Button-1>', self.flickrcallback)
 
                 # Presets the counters for the photo getter
-                row = 15
+                row = 17
                 count = 0
                 urlNr = 0
-                columns = 3
                 # checks if the twitter checkbox is clicked and if so, sets the column for
                 # every other image different, to have it evenly displayed (otherwise pictures out of frame)
-                if self.chkTwitter.get():
+                if self.chkTwitter.get() or self.chkWiki.get():
                     columns = 2
+                else:
+                    columns = 3
 
 
                 #Gets the images that are stored in the imageArray, then opens them with PIL, and then displays them in a label
@@ -236,7 +253,7 @@ class Main(Frame):
                 self.lblDisplayTwitterURL.config(text="http://twitter.com/search?q=" + str(userSearch) + "&src=typd", fg="Blue", cursor="hand2")
                 self.lblDisplayTwitterURL.bind('<Button-1>', self.twittercallback)
                 self.lblDisplayTwitterData.config(text=readFile, font="Times 10", justify=LEFT)
-                self.lblDisplayTwitterData.grid(row=27, column=2, sticky=W)
+                self.lblDisplayTwitterData.grid(row=29, column=2, sticky=W)
 
 
         multi = threading.Thread(target=search)
