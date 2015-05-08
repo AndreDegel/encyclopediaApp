@@ -58,6 +58,9 @@ class flickrSearch:
                 self.imageArray.append(pilImage)
 
                 i += 1
-
+        # catch exception if less then 10 results are returned
         except IndexError:
-            messagebox.showinfo("Error", "No Results returned")
+            messagebox.showerror("Error", "Could not return all 10 results")
+        # catch exception if no results are returned due to no connction
+        except UnboundLocalError:
+            messagebox.showerror("Error", "Could not return anything because there is no connection")

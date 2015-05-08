@@ -1,5 +1,9 @@
+import tweepy
+
 __author__ = 'Andre'
+
 from tkinter import *
+from tkinter import messagebox
 import webbrowser
 from tweepy import Stream
 from tweepy import OAuthHandler
@@ -215,9 +219,13 @@ class Main(Frame):
 
                 #Streams the tweets using the Listener class and searches with the criteria of the userSearch
                 twitterStream = Stream(authorize, Listener())
-
-                #Filters the twitter results with the user search input
-                twitterStream.filter(track=[userSearch])
+                try:
+                # Try Filters the twitter results with the user search input and retrieve accordingly
+                    twitterStream.filter(track=[userSearch])
+                # we catch a runtime error because it does not throw any specific exception
+                # due to the fact that many processes are running and tweepys handling is not good
+                except RuntimeError:
+                    messagebox.showerror("Error", "Could not retrieve anything from Twitter")
 
                 #Opens the tDB3 file and reads for displaying in the lblDisplayTwitterData below, and then closes it
                 saveFile2 = open('tDB3.csv')
