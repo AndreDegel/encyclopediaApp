@@ -1,3 +1,6 @@
+from textwrap import TextWrapper
+import textwrap
+
 __author__ = 'Andre'
 
 from tkinter import *
@@ -167,7 +170,18 @@ class Main(Frame):
                 # display the first two sentences of the wiki page using the wikipedia api
                 # http://stackoverflow.com/questions/4460921/extract-the-first-paragraph-from-a-wikipedia-article-python
                 try:
-                    self.lblDisplayWikiData.config(text=wikipedia.summary(userSearch, sentences=2), font="Times 10", justify=LEFT)
+                    # get the first two sentences from wikipedia
+                    summary = wikipedia.summary(userSearch, sentences=2)
+                    # format them so it is not one continuouse line
+                    # using the wrap function of the TextWrap class to split ino a list with 70 chars each
+                    wrapped = textwrap.wrap(summary, width=90)
+                    # since the wrap method returns a list, we have to reasemble the text
+                    # and ad the wanted newline characters
+                    wrappedSummary = ""
+                    for part in wrapped:
+                        wrappedSummary += part + "\n"
+
+                    self.lblDisplayWikiData.config(text=wrappedSummary, font="Times 10", justify=LEFT)
                 # Catch disambiguous pages
                 except DisambiguationError:
                     messagebox.showwarning("Warning", "Articles are ambiguous. Try something more specific or check the Wiki page")
@@ -266,8 +280,10 @@ class Main(Frame):
         self.lblDisplayWikiURL.config(text="")
         self.lblDisplayFlickrURL.config(text="")
         self.lblDisplayTwitterURL.config(text="")
+        self.lblDisplayWikiData.config(text="")
         self.lblDisplayFlickrData.grid_forget()
         self.lblDisplayTwitterData.grid_forget()
+
 
     #Function for closing the window
     def close(self):
