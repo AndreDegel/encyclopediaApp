@@ -1,6 +1,3 @@
-from textwrap import TextWrapper
-import textwrap
-
 __author__ = 'Andre'
 
 from tkinter import *
@@ -13,6 +10,7 @@ from flickrSearch import flickrSearch
 from twitterSearch import Listener
 from PIL import ImageTk
 from wikipedia import *
+import textwrap
 
 # Read the Key and secret from a file and add it to an array for security
 # read out of array for authentication

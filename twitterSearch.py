@@ -1,13 +1,11 @@
-from tkinter import messagebox
 from tweepy import StreamListener
 import textwrap
-import tweepy
 
 __author__ = 'Andre'
 
 class Listener(StreamListener):
 
-    def __init__(self, api=None):
+    def __init__(self):
         super(Listener, self).__init__()
         self.searchTweets = 11
         self.tweetArray = []
