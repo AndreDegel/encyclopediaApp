@@ -1,0 +1,19 @@
+This program is a little "encyclopedia" application, that retrieves a Wikipedia page, with the first two sentences,
+10 Flickr pictures, and 10 Tweets, according to the users search.
+If there is no internet connection, the search term doesn't exist, or the websites could not return enough
+content, the program will respond accordingly. The only exception here is the Twitter response, that just
+does not return anything if the search term does not exist.
+To achieve all this I used some API's and want herby thank their creators because without them, this would
+have been not as easy. I also want to mention the API's I used in case somebody want to modify or improve
+this application.
+
+API's used:
+
+Flickr Python API:      Author: Sybren A. Stuvel
+                        Home Page: http://stuvel.eu/projects/flickrapi
+
+Twitter Python API:     Author: Joshua Roesslein
+                        Home Page: http://github.com/tweepy/tweepy
+
+Wikipedia Python API:   Author: Jonathan Goldsmith
+                        Home Page: https://github.com/goldsmith/Wikipedia

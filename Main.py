@@ -156,7 +156,8 @@ class Main(Frame):
 
         #Search Function
         def search():
-
+            # clear the last search in case it hasn't been cleared manually.
+            self.clear()
             #Gets text from search textbox
             userSearch = self.userSearch.get()
 
