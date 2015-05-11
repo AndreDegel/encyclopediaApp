@@ -186,11 +186,11 @@ class Main(Frame):
                     messagebox.showwarning("Warning", "Articles are ambiguous. Try something more specific or check the Wiki page")
                 # Catch page not found
                 except PageError:
-                    messagebox.showerror("Error", "Sorry, but there is no such page on Wikipedia")
+                    messagebox.showerror("Wiki Error", "Sorry, but there is no such page on Wikipedia")
                 # Catch no connection as general error because it cant be cought
                 # as connection error because too many processes
                 except:
-                    messagebox.showerror("Error", "Could not connect to Wikipedia. Please check your Internet connection.")
+                    messagebox.showerror("Wiki Error", "Could not connect to Wikipedia. Please check your Internet connection.")
                 self.lblDisplayWikiURL.bind('<Button-1>', self.wikicallback)
 
             #Flickr Checkbox
@@ -255,7 +255,7 @@ class Main(Frame):
                 # we catch a runtime error because it does not throw any specific exception
                 # due to the fact that many processes are running and tweepys handling is not good
                 except RuntimeError:
-                    messagebox.showerror("Error", "Could not retrieve anything from Twitter")
+                    messagebox.showerror("Twitter Error", "Could not retrieve anything from Twitter")
 
                 #Opens the tDB3 file and reads for displaying in the lblDisplayTwitterData below, and then closes it
                 saveFile2 = open('tDB3.csv')

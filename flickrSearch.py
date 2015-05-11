@@ -33,7 +33,7 @@ class flickrSearch:
         # catch exception if not connected to the internet
         # since it also runs in a thread I could not find the correct exception.
         except:
-            messagebox.showinfo("Error", "Flicker could not connect and return any data. Check if you are connected to the internet")
+            messagebox.showinfo("Flickr Error", "Flicker could not connect and return any data. Check if you are connected to the internet")
 
         try:
             #While loop that gets specific data of the images for building the photo URL while i < 10
@@ -60,7 +60,7 @@ class flickrSearch:
                 i += 1
         # catch exception if less then 10 results are returned
         except IndexError:
-            messagebox.showerror("Error", "Could not return all 10 results")
+            messagebox.showerror("Flickr Error", "Could not return all 10 results")
         # catch exception if no results are returned due to no connction
         except UnboundLocalError:
-            messagebox.showerror("Error", "Could not return anything because there is no connection")
+            messagebox.showerror("Flickr Error", "Could not return anything because there is no connection")
